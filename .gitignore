@@ -1,0 +1,6 @@
+# Local credentials and machine-specific application configuration
+prototype-agf-crm/.env.local
+
+# Generated scratch workspace used during lead extraction.
+.tmp_lead_pull/
+node_modules/
