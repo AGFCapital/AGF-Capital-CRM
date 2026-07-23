@@ -1,20 +1,30 @@
-const STORAGE_KEY = "agf-crm-local-v1";
 const SESSION_KEY = "agf-crm-supabase-session-v1";
 const defaultMessage = "{Nome}, tudo bem? Obrigado por aceitar o convite.\n\nVi {trigger da empresa}. Imagino que usar AI de verdade no financeiro, sem virar projeto eterno, esteja na pauta ai tambem.\n\nMontei a AGF exatamente para isso. Contamos com profissionais das melhores consultorias do Brasil, que atuam no dia a dia da empresa, do operacional ao estrategico, criando automacoes no caminho.\n\nEu venho de 10+ anos entre banking e corporate development, e fundei uma empresa na qual levantei recursos com investidores institucionais.\n\nTopa 15-30 minutos para eu me apresentar rapidamente?";
 
 const stages = [
-  ["ready_to_send", "Prontos para enviar"],
-  ["approved", "Aprovado"],
-  ["send_invitation", "Enviar convite"],
-  ["invitation_sent", "Convite enviado"],
-  ["send_message", "Enviar mensagem"],
-  ["in_conversation", "Em conversa"],
-  ["scheduling", "Agendamento"],
-  ["call_booked", "Call marcada"],
-  ["concluded", "Concluido"],
+  ["qualificado", "Qualificado"],
+  ["revisao_manual", "Revisao manual"],
+  ["aprovado", "Aprovado"],
+  ["convite_enviado", "Convite enviado"],
+  ["conexao_aceita", "Conexao aceita"],
+  ["mensagem_enviada", "Mensagem enviada"],
+  ["em_conversa", "Em conversa"],
+  ["agendamento", "Agendamento"],
+  ["call_marcada", "Call marcada"],
+  ["concluido", "Concluido"],
+  ["convite_expirado", "Convite expirado"],
+  ["descartado", "Descartado"],
 ];
 
 const stageNames = Object.fromEntries(stages);
+const nextStageByStage = {
+  qualificado: "aprovado",
+  conexao_aceita: "mensagem_enviada",
+  mensagem_enviada: "em_conversa",
+  em_conversa: "agendamento",
+  agendamento: "call_marcada",
+  call_marcada: "concluido",
+};
 const defaultSettings = {
   extractionEnabled: true,
   extractionTime: "08:00",
@@ -23,81 +33,30 @@ const defaultSettings = {
   sendStart: "09:00",
   sendEnd: "20:00",
   dailyAlertAt: 20,
+  outreachEnabled: true,
+  outreachDryRun: true,
   callDuration: 30,
   slotInterval: 15,
 };
 
-const seedLeads = [
-  {
-    id: "V-042", company: "Vertice Logistica", contact: "Marina Teixeira", role: "Head de Controladoria", source: "Vagas", stage: "ready_to_send", score: 8,
-    trigger: "abriu posicao de Controller Corporativo", news: "Expansao de dois centros de distribuicao anunciada em junho.",
-    profile: "Brasil | +500 conexoes | perfil contatavel", realEconomy: true, location: "Goiania, GO",
-    message: "Marina, tudo bem? Obrigado por aceitar o convite.\n\nVi a expansao da Vertice junto a busca por alguem para a controladoria corporativa. Imagino que usar AI de verdade no financeiro, sem virar projeto eterno, esteja na pauta ai tambem.\n\nMontei a AGF exatamente para isso. Contamos com profissionais das melhores consultorias do Brasil, que atuam no dia a dia da empresa, do operacional ao estrategico, criando automacoes no caminho.\n\nEu venho de 10+ anos entre banking e corporate development, e fundei uma empresa na qual levantei recursos com investidores institucionais.\n\nTopa 15-30 minutos para eu me apresentar rapidamente?",
-    scoreBreakdown: { companySize: 3, urgency: 2, decisionMaker: 1, realEconomy: 2 },
-    history: ["Perfil validado", "Sinal de vaga confirmado", "Rascunho preparado"],
-  },
-  {
-    id: "MM-118", company: "Ceu Azul Alimentos", contact: "Renato Duarte", role: "CEO", source: "Middle market", stage: "ready_to_send", score: 7,
-    trigger: "crescimento regional e emissao de debentures", news: "Captacao para expansao industrial noticiada ha dois meses.",
-    profile: "Brasil | +500 conexoes | perfil contatavel", realEconomy: true, location: "Uberlandia, MG",
-    message: "Renato, tudo bem? Obrigado por aceitar o convite.\n\nVi o momento de expansao da Ceu Azul e a recente emissao de debentures. Imagino que usar AI de verdade no financeiro, sem virar projeto eterno, esteja na pauta ai tambem.\n\nMontei a AGF exatamente para isso. Contamos com profissionais das melhores consultorias do Brasil, que atuam no dia a dia da empresa, do operacional ao estrategico, criando automacoes no caminho.\n\nEu venho de 10+ anos entre banking e corporate development, e fundei uma empresa na qual levantei recursos com investidores institucionais.\n\nTopa 15-30 minutos para eu me apresentar rapidamente?",
-    scoreBreakdown: { companySize: 3, financialMoment: 1, decisionMaker: 1, realEconomy: 2 },
-    history: ["Perfil validado", "Debenture e expansao verificados", "Rascunho preparado"],
-  },
-  {
-    id: "V-041", company: "NorteSul Varejo", contact: "Bianca Salles", role: "Gerente de FP&A", source: "Vagas", stage: "invitation_sent", score: 7,
-    trigger: "busca por analista de FP&A", news: "Crescimento de lojas no Nordeste informado no site institucional.",
-    profile: "Brasil | +500 conexoes | convite disponivel", realEconomy: true, location: "Recife, PE",
-    message: "Bianca, tudo bem? Obrigado por aceitar o convite.\n\nVi a busca da NorteSul por alguem em FP&A. Imagino que usar AI de verdade no financeiro, sem virar projeto eterno, esteja na pauta ai tambem.",
-    scoreBreakdown: { companySize: 3, urgency: 1, decisionMaker: 1, realEconomy: 2 },
-    history: ["Perfil validado", "Convite preparado no piloto"],
-  },
-  {
-    id: "MM-117", company: "Rota Oeste Transportes", contact: "Alexandre Campos", role: "CFO", source: "Middle market", stage: "in_conversation", score: 6,
-    trigger: "nova unidade e aumento de capacidade operacional", news: "Empresa comunicou abertura de filial no Centro-Oeste em maio.",
-    profile: "Brasil | +500 conexoes | perfil contatavel", realEconomy: true, location: "Campo Grande, MS",
-    message: "Alexandre, tudo bem? Obrigado por aceitar o convite.",
-    scoreBreakdown: { companySize: 2, financialMoment: 1, decisionMaker: 1, realEconomy: 2 },
-    history: ["Perfil validado", "Sinal operacional confirmado", "Lead em conversa"],
-  },
-  {
-    id: "V-038", company: "Horizonte Saude", contact: "Paula Nascimento", role: "Head de Financas", source: "Vagas", stage: "call_booked", score: 8,
-    trigger: "contratacao para Controladoria e FP&A", news: "Aquisicao de clinica regional confirmada em abril.",
-    profile: "Brasil | +500 conexoes | perfil contatavel", realEconomy: true, location: "Belo Horizonte, MG",
-    meeting: "Amanha, 14:30 | Google Meet", message: "Paula, tudo bem? Obrigado por aceitar o convite.",
-    scoreBreakdown: { companySize: 3, urgency: 2, decisionMaker: 1, realEconomy: 2 },
-    history: ["Perfil validado", "Call de 30 minutos confirmada"],
-  },
-];
-
-function cloneSeed() { return JSON.parse(JSON.stringify(seedLeads)); }
-function loadState() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return { leads: parsed.leads || cloneSeed(), settings: { ...defaultSettings, ...(parsed.settings || {}) } };
-  } catch { return { leads: cloneSeed(), settings: { ...defaultSettings } }; }
-}
-
-const persisted = loadState();
 const state = {
-  leads: persisted.leads,
-  settings: persisted.settings,
+  leads: [],
+  settings: { ...defaultSettings },
   selectedId: null,
   settingsOpen: false,
   page: "operation",
   draggedId: null,
-  remote: { config: null, session: readSession(), enabled: false, loading: true },
+  remote: { config: null, session: readSession(), enabled: false, loading: true, error: null },
 };
 const root = document.querySelector("#app");
 
-function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify({ leads: state.leads, settings: state.settings })); }
 function readSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
 function writeSession(session) { state.remote.session = session; if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session)); else localStorage.removeItem(SESSION_KEY); }
 function escapeHtml(value = "") { return value.replace(/[&<>\"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char])); }
 function leadById(id) { return state.leads.find((lead) => lead.id === id); }
 function scoreClass(score) { return score >= 7 ? "high" : score >= 5 ? "medium" : "low"; }
 function sourceClass(source) { return source === "Vagas" ? "vacancy" : "middle"; }
-function nextStage(key) { return stages[Math.min(stages.length - 1, stages.findIndex(([id]) => id === key) + 1)]?.[0]; }
+function nextStage(key) { return nextStageByStage[key] || null; }
 
 async function fetchConfiguration() {
   const response = await fetch("/api/config", { cache: "no-store" });
@@ -139,18 +98,25 @@ async function signIn(email, password) {
   writeSession(session);
 }
 
-function messageFor(row, company, contact) {
+function messageFor(row, company, contact, signals) {
   const drafts = row.message_drafts || [];
   const currentDraft = drafts.find((draft) => draft.is_current) || drafts[0];
   if (currentDraft?.body) return currentDraft.body;
-  return defaultMessage.replace("{Nome}", contact?.full_name?.split(" ")[0] || "").replace("{trigger da empresa}", row.signal_summary || company?.name || "o momento da empresa");
+  const trigger = signals[0]?.summary || company?.name || "o momento da empresa";
+  return defaultMessage.replace("{Nome}", contact?.full_name?.split(" ")[0] || "").replace("{trigger da empresa}", trigger);
 }
 
 function mapRemoteLead(row) {
   const company = row.company || {};
   const contact = row.contact || {};
   const booking = (row.calendar_bookings || [])[0];
-  const news = Array.isArray(row.recent_news) && row.recent_news.length ? row.recent_news.map((item) => item.title || item.summary || item).join(" | ") : "Contexto ainda em enriquecimento.";
+  const signals = (row.lead_signals || [])
+    .filter((signal) => signal.source_url && signal.verified_at)
+    .sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
+  const trigger = signals[0]?.summary || "Sem sinal verificado";
+  const news = signals.length
+    ? signals.map((signal) => `${signal.summary} (${signal.source_name})`).join(" | ")
+    : "Sem sinal verificado.";
   return {
     id: row.id,
     company: company.name || "Empresa sem nome",
@@ -166,13 +132,14 @@ function mapRemoteLead(row) {
       decisionMaker: row.decision_maker_score || 0,
       realEconomy: row.real_economy_bonus || 0,
     },
-    trigger: row.signal_summary || "Sinal a confirmar",
+    trigger,
     news,
+    signals,
     profile: contact.profile_gate_passed ? `${contact.location_country || "Brasil"} | ${contact.connection_count || "+100"} conexoes | perfil contatavel` : (contact.profile_gate_reason || "Perfil pendente de validacao"),
     realEconomy: company.real_economy,
     location: [company.headquarters_city, company.headquarters_state].filter(Boolean).join(", "),
-    meeting: booking?.starts_at ? `${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(booking.starts_at))} | Google Meet` : null,
-    message: messageFor(row, company, contact),
+    meeting: booking?.starts_at ? `${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(booking.starts_at))} | Reuniao online` : null,
+    message: messageFor(row, company, contact, signals),
     history: ["Importado do Supabase", row.company_overview || row.contact_context || "Contexto disponivel no card"].filter(Boolean),
     linkedinUrl: contact.linkedin_url,
   };
@@ -182,6 +149,7 @@ function settingsFromRows(rows) {
   const values = Object.fromEntries(rows.map((row) => [row.setting_key, row.value]));
   const extraction = values.lead_extraction || {};
   const outbound = values.outbound || {};
+  const outreach = values.outreach || {};
   const calendar = values.calendar || {};
   return {
     ...state.settings,
@@ -192,20 +160,21 @@ function settingsFromRows(rows) {
     sendStart: outbound.start ?? state.settings.sendStart,
     sendEnd: outbound.end ?? state.settings.sendEnd,
     dailyAlertAt: outbound.daily_alert_at ?? state.settings.dailyAlertAt,
+    outreachEnabled: outreach.enabled ?? state.settings.outreachEnabled,
+    outreachDryRun: outreach.dry_run ?? state.settings.outreachDryRun,
     callDuration: calendar.duration_minutes ?? state.settings.callDuration,
     slotInterval: calendar.slot_minutes ?? state.settings.slotInterval,
   };
 }
 
 async function loadRemoteData() {
-  const query = "/rest/v1/leads?select=id,current_stage,total_score,company_size_score,urgency_score,financial_moment_score,decision_maker_score,real_economy_bonus,source,signal_summary,company_overview,contact_context,recent_news,company:companies(name,headquarters_city,headquarters_state,real_economy),contact:contacts(full_name,title,linkedin_url,profile_gate_passed,profile_gate_reason,connection_count,location_country),message_drafts(body,is_current),calendar_bookings(starts_at,status)&order=created_at.desc";
+  const query = "/rest/v1/leads?select=id,current_stage,total_score,company_size_score,urgency_score,financial_moment_score,decision_maker_score,real_economy_bonus,source,company_overview,contact_context,company:companies(name,headquarters_city,headquarters_state,real_economy),contact:contacts(full_name,title,linkedin_url,profile_gate_passed,profile_gate_reason,connection_count,location_country),lead_signals(summary,family,source_url,source_name,published_at,occurred_at,verified_at,verification_method),message_drafts(body,is_current),calendar_bookings(starts_at,status,meeting_url,match_status)&order=created_at.desc";
   const [leadRows, settingRows] = await Promise.all([
     supabaseRequest(query),
     supabaseRequest("/rest/v1/app_settings?select=setting_key,value"),
   ]);
   state.leads = leadRows.map(mapRemoteLead);
   state.settings = settingsFromRows(settingRows);
-  persist();
 }
 
 function loginPage() {
@@ -232,7 +201,7 @@ function appShell(content) {
       <div class="brand"><div class="brand-mark">A</div><div><strong>AGF</strong><span>Capital</span></div></div>
       <nav>
         <button data-page="operation" class="nav-item ${state.page === "operation" ? "active" : ""}"><span>01</span> Operacao</button>
-        <button data-page="agenda" class="nav-item ${state.page === "agenda" ? "active" : ""}"><span>02</span> Agendamentos <b>${state.leads.filter((lead) => lead.stage === "call_booked").length}</b></button>
+        <button data-page="agenda" class="nav-item ${state.page === "agenda" ? "active" : ""}"><span>02</span> Agendamentos <b>${state.leads.filter((lead) => lead.stage === "call_marcada").length}</b></button>
         <button data-page="history" class="nav-item ${state.page === "history" ? "active" : ""}"><span>03</span> Historico</button>
       </nav>
       <div class="sidebar-bottom"><button data-action="settings" class="settings-button">Configuracoes</button><button data-action="logout" class="settings-button">Sair</button><div class="operator"><div class="avatar">${operatorName().split(" ").map((part) => part[0]).join("").slice(0, 2)}</div><div><strong>${operatorName()}</strong><span>${state.remote.enabled ? "Base compartilhada" : "Modo local"}</span></div></div></div>
@@ -246,9 +215,9 @@ function header(eyebrow, title, description, actions = "") {
 }
 
 function metrics() {
-  const ready = state.leads.filter((lead) => lead.stage === "ready_to_send").length;
-  const conversations = state.leads.filter((lead) => lead.stage === "in_conversation").length;
-  const booking = state.leads.find((lead) => lead.stage === "call_booked");
+  const ready = state.leads.filter((lead) => lead.stage === "qualificado").length;
+  const conversations = state.leads.filter((lead) => lead.stage === "em_conversa").length;
+  const booking = state.leads.find((lead) => lead.stage === "call_marcada");
   return `<section class="metrics">
     <div><span>Abordagens hoje</span><strong>12</strong><small>Alerta em ${state.settings.dailyAlertAt}</small></div>
     <div><span>Prontos para enviar</span><strong>${ready}</strong><small>Somente perfis qualificados</small></div>
@@ -268,7 +237,15 @@ function card(lead) {
 }
 
 function emptyStage(stage) {
-  const messages = { approved: "Aprovacoes ficam prontas para o convite.", send_message: "Ao mover aqui, o CRM prepara o disparo para revisao.", scheduling: "Leads interessados recebem o link de agenda.", concluded: "O historico comercial permanece aqui." };
+  const messages = {
+    revisao_manual: "Sinais insuficientes ou ambíguos aguardam revisao.",
+    aprovado: "Aprovacoes aguardam o workflow de convite.",
+    conexao_aceita: "Aceites detectados entram na fila manual de mensagem.",
+    agendamento: "Leads interessados aguardam o link de agenda.",
+    concluido: "O historico comercial permanece aqui.",
+    convite_expirado: "Convites sem aceite apos 21 dias.",
+    descartado: "Leads descartados com motivo registrado.",
+  };
   return `<div class="empty-state">${messages[stage] || "Sem leads nesta etapa."}</div>`;
 }
 
@@ -299,7 +276,7 @@ function leadDrawer(lead) {
     <div class="profile-gate"><strong>Perfil aprovado</strong><span>${lead.profile}</span></div>
     <div class="score-breakdown"><div><span>Score comercial</span><strong>${lead.score}<small>/10</small></strong></div><ul>${scores.map(([name, value]) => `<li>${name}<b>${value}</b></li>`).join("")}</ul></div>
     <section><h3>Gatilho</h3><p>${lead.trigger}</p></section><section><h3>Contexto recente</h3><p>${lead.news}</p><button class="text-link" data-action="source">Fonte e evidencia</button></section>
-    ${lead.meeting ? `<div class="calendar-block"><strong>${lead.meeting}</strong><span>Evento reservado no Google Calendar</span></div>` : ""}
+    ${lead.meeting ? `<div class="calendar-block"><strong>${lead.meeting}</strong><span>Reserva confirmada pelo provedor de agenda</span></div>` : ""}
     <section><h3>Rascunho de mensagem</h3><pre>${escapeHtml(lead.message)}</pre><button class="text-link" data-action="edit">Editar rascunho</button></section>
     <section><h3>Historico</h3><ul class="history-list">${lead.history.map((item) => `<li>${item}</li>`).join("")}</ul></section>
     <footer><button class="button secondary" data-action="close-detail">Fechar</button>${following ? `<button class="button primary" data-action="advance" data-lead="${lead.id}" data-stage="${following}">Mover para ${stageNames[following]}</button>` : ""}</footer>
@@ -312,7 +289,7 @@ function settingsModal() {
     <header><div><p class="eyebrow">ADMINISTRACAO</p><h2>Configuracoes da operacao</h2><p>Todos os operadores com acesso podem ajustar estes parametros.</p></div><button data-action="close-settings" aria-label="Fechar">x</button></header>
     <form id="settings-form">
       <section><div><h3>Extracao de leads</h3><p>Somente contatos aprovados pelos filtros entram no CRM.</p></div><label class="switch"><input name="extractionEnabled" type="checkbox" ${setting.extractionEnabled ? "checked" : ""}><span></span> Rotina automatica</label><div class="field-grid"><label>Horario<input name="extractionTime" type="time" value="${setting.extractionTime}"></label><label>Vagas<input name="vacancyCount" type="number" min="1" value="${setting.vacancyCount}"></label><label>Middle market<input name="middleMarketCount" type="number" min="1" value="${setting.middleMarketCount}"></label></div></section>
-      <section><div><h3>Envio</h3><p>A integracao real ainda depende da credencial do LinkedIn e permanece desligada neste ambiente.</p></div><div class="field-grid"><label>Inicio<input name="sendStart" type="time" value="${setting.sendStart}"></label><label>Fim<input name="sendEnd" type="time" value="${setting.sendEnd}"></label><label>Alerta diario<input name="dailyAlertAt" type="number" min="1" value="${setting.dailyAlertAt}"></label></div></section>
+      <section><div><h3>Convites</h3><p>O dry-run impede qualquer chamada real ao PhantomBuster.</p></div><label class="switch"><input name="outreachEnabled" type="checkbox" ${setting.outreachEnabled ? "checked" : ""}><span></span> Rotina habilitada</label><label class="switch"><input name="outreachDryRun" type="checkbox" ${setting.outreachDryRun ? "checked" : ""}><span></span> Dry-run ativo</label><div class="field-grid"><label>Inicio<input name="sendStart" type="time" value="${setting.sendStart}"></label><label>Fim<input name="sendEnd" type="time" value="${setting.sendEnd}"></label><label>Alerta diario<input name="dailyAlertAt" type="number" min="1" value="${setting.dailyAlertAt}"></label></div></section>
       <section><div><h3>Calls</h3><p>Slots de 30 minutos, em :00, :15, :30 ou :45.</p></div><div class="field-grid"><label>Duracao<input type="number" value="${setting.callDuration}" readonly></label><label>Intervalo<input type="number" value="${setting.slotInterval}" readonly></label></div></section>
       <footer><button type="button" class="button secondary" data-action="close-settings">Cancelar</button><button type="submit" class="button primary">Salvar configuracoes</button></footer>
     </form>
@@ -320,8 +297,8 @@ function settingsModal() {
 }
 
 function agendaPage() {
-  const bookings = state.leads.filter((lead) => lead.stage === "call_booked");
-  return appShell(`${header("AGENDA", "Calls confirmadas", "Cada evento deve ser criado pelo Google Calendar com Meet e confirmacao automatica.", `<button class="button secondary" data-action="settings">Configuracoes de agenda</button>`)}
+  const bookings = state.leads.filter((lead) => lead.stage === "call_marcada");
+  return appShell(`${header("AGENDA", "Calls confirmadas", "Reservas identificadas retornam ao CRM pelo webhook do provedor de agenda.", `<button class="button secondary" data-action="settings">Configuracoes de agenda</button>`)}
     <section class="agenda-list">${bookings.length ? bookings.map((lead) => `<button class="agenda-row" data-lead="${lead.id}"><span class="agenda-time">${lead.meeting || "Horario pendente"}</span><div><strong>${lead.company}</strong><small>${lead.contact} | ${lead.role}</small></div><span>Ver card</span></button>`).join("") : `<div class="empty-page">Nenhuma call marcada.</div>`}</section>
     ${state.selectedId ? leadDrawer(leadById(state.selectedId)) : ""}${state.settingsOpen ? settingsModal() : ""}`);
 }
@@ -336,6 +313,10 @@ function historyPage() {
 function render() {
   if (state.remote.loading) {
     root.innerHTML = `<main class="loading-page">Carregando CRM AGF...</main>`;
+    return;
+  }
+  if (state.remote.error || !state.remote.enabled) {
+    root.innerHTML = `<main class="loading-page">O CRM precisa de uma configuracao Supabase valida. ${escapeHtml(state.remote.error || "Configuracao ausente.")}</main>`;
     return;
   }
   if (state.remote.enabled && !state.remote.session?.access_token) {
@@ -362,12 +343,17 @@ async function updateLeadStage(id, stage) {
         body: JSON.stringify({ current_stage: stage }),
       });
     }
-    lead.history.unshift(`Etapa movida para ${stageNames[stage]}`); lead.stage = stage; persist(); state.selectedId = id; render();
+    lead.history.unshift(`Etapa movida para ${stageNames[stage]}`); lead.stage = stage; state.selectedId = id; render();
   } catch (error) {
     toast(error.message || "A etapa nao foi atualizada.");
     return;
   }
-  const notices = { send_message: "Mensagem preparada para o piloto. Nenhum envio real foi efetuado.", scheduling: "Link de agendamento sera preparado na integracao do Calendar.", call_booked: "Call marcada. O horario aparece no card." };
+  const notices = {
+    conexao_aceita: "Conexao aceita. A mensagem continua manual.",
+    mensagem_enviada: "Envio manual registrado.",
+    agendamento: "Lead pronto para receber o link de agenda.",
+    call_marcada: "Call marcada. O horario aparece no card.",
+  };
   toast(notices[stage] || `Etapa atualizada: ${stageNames[stage]}.`);
 }
 
@@ -422,10 +408,10 @@ function bindEvents() {
   }));
   document.querySelector("#settings-form")?.addEventListener("submit", async (event) => {
     event.preventDefault(); const values = new FormData(event.currentTarget);
-    state.settings = { ...state.settings, extractionEnabled: values.get("extractionEnabled") === "on", extractionTime: values.get("extractionTime"), vacancyCount: Number(values.get("vacancyCount")), middleMarketCount: Number(values.get("middleMarketCount")), sendStart: values.get("sendStart"), sendEnd: values.get("sendEnd"), dailyAlertAt: Number(values.get("dailyAlertAt")) };
+    state.settings = { ...state.settings, extractionEnabled: values.get("extractionEnabled") === "on", extractionTime: values.get("extractionTime"), vacancyCount: Number(values.get("vacancyCount")), middleMarketCount: Number(values.get("middleMarketCount")), outreachEnabled: values.get("outreachEnabled") === "on", outreachDryRun: values.get("outreachDryRun") === "on", sendStart: values.get("sendStart"), sendEnd: values.get("sendEnd"), dailyAlertAt: Number(values.get("dailyAlertAt")) };
     try {
       if (state.remote.enabled) await saveRemoteSettings();
-      state.settingsOpen = false; persist(); render(); toast(state.remote.enabled ? "Configuracoes salvas no Supabase." : "Configuracoes salvas localmente.");
+      state.settingsOpen = false; render(); toast("Configuracoes salvas no Supabase.");
     } catch (error) { toast(error.message || "As configuracoes nao foram salvas."); }
   });
   document.querySelector("#login-form")?.addEventListener("submit", async (event) => {
@@ -439,9 +425,11 @@ function bindEvents() {
 async function saveRemoteSettings() {
   const extraction = { enabled: state.settings.extractionEnabled, time: state.settings.extractionTime, timezone: "America/Sao_Paulo", weekdays: [1, 2, 3, 4, 5], vacancy_count: state.settings.vacancyCount, middle_market_count: state.settings.middleMarketCount };
   const outbound = { start: state.settings.sendStart, end: state.settings.sendEnd, timezone: "America/Sao_Paulo", daily_alert_at: state.settings.dailyAlertAt };
+  const outreach = { enabled: state.settings.outreachEnabled, dry_run: state.settings.outreachDryRun };
   await Promise.all([
     supabaseRequest("/rest/v1/app_settings?setting_key=eq.lead_extraction", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: extraction }) }),
     supabaseRequest("/rest/v1/app_settings?setting_key=eq.outbound", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: outbound }) }),
+    supabaseRequest("/rest/v1/app_settings?setting_key=eq.outreach", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: outreach }) }),
   ]);
 }
 
@@ -452,7 +440,7 @@ async function bootstrap() {
     if (state.remote.enabled && state.remote.session?.access_token) await loadRemoteData();
   } catch (error) {
     state.remote.enabled = false;
-    toast("A configuracao remota nao foi carregada. O CRM abriu em modo local.");
+    state.remote.error = error.message || "A configuracao remota nao foi carregada.";
   } finally {
     state.remote.loading = false;
     render();
