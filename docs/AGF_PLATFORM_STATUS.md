@@ -1,124 +1,105 @@
-# AGF — estado atual da plataforma de geração de leads
+# AGF CRM — estado atual da plataforma
 
-**Atualizado em:** 22 de julho de 2026  
-**Objetivo atual:** concluir o CRM web e o fluxo de descoberta, qualificação e
-enriquecimento de leads para implementação de IA em finanças corporativas.
+**Atualizado em:** 22 de julho de 2026
+**Objetivo:** concluir o CRM web e as automações que descobrem, qualificam, enriquecem e conduzem leads para implementação de IA em finanças corporativas.
 
-## Resumo
+O briefing comercial e técnico completo está em [AGF_PROJECT_BRIEF.md](./AGF_PROJECT_BRIEF.md). Este documento é um retrato objetivo do que existe, do que está conectado e do que ainda não foi ativado.
 
-O CRM será uma aplicação web compartilhada pela equipe. O **Supabase** é a
-fonte de verdade para autenticação, empresas, contatos, leads, etapas,
-configurações e histórico. O **Google Sheets** permanece como entrada dos
-resultados do PhantomBuster e espelho auditável do campo `Status CRM`.
+## Arquitetura vigente
 
-As duas bases em escopo são:
-
-1. **Vagas — leads quentes:** empresas com vaga financeira aberta, sinal atual
-   de aumento de demanda.
-2. **Middle market — prospecção proativa:** empresas com proxy de faturamento
-   de R$ 50–500 milhões e sinal financeiro/operacional verificável.
-
-M&A e startups estão pausados no fluxo ativo.
-
-```mermaid
-flowchart LR
-  PB[PhantomBuster\nextração LinkedIn] --> GSIN[Google Sheets\nentrada bruta]
-  GSIN --> N8N[n8n\nqualificação e enriquecimento]
-  N8N --> SB[Supabase\nfonte de verdade]
-  SB --> APP[Aplicação AGF\nkanban]
-  SB -->|somente Status CRM| GSOUT[Google Sheets\nespelho]
-  APP -->|aprovação humana| LI[LinkedIn\nconvite/mensagem]
-  LI -->|interesse| CAL[Google Calendar\nagendamento + Meet]
-  CAL --> SB
+```text
+PhantomBuster → Google Sheets (entrada) → n8n (qualificação/enriquecimento)
+→ Supabase (fonte de verdade) → aplicação AGF (Kanban)
+→ Supabase → n8n → Google Sheets (somente Status CRM)
 ```
 
-## O que está pronto
+- **Supabase:** fonte de verdade para autenticação, empresas, contatos, leads, estágios, configurações, filas e histórico.
+- **Google Sheets:** entrada e espelho auditável da coluna `Status CRM`; não é um segundo CRM.
+- **n8n:** único lugar para credenciais privilegiadas e automações externas.
+- **Aplicação AGF:** interface compartilhada de operação, revisão e avanço dos cards.
+- **PhantomBuster:** coleta no LinkedIn; não existe Phantom de outbound ativo em produção.
 
-| Componente | Estado | Observação |
+As bases ativas são `Vagas — leads quentes` e `Middle market — prospecção proativa`. M&A e startups permanecem fora do fluxo ativo.
+
+## Estado por componente
+
+| Componente | Estado atual | Próximo passo necessário |
 |---|---|---|
-| Regras de qualificação | Documentadas | `LEAD_EXTRACTION_RULES.md` reúne portfólio, score, perfil e contato por porte. |
-| Saved searches | Documentadas | `docs/LINKEDIN_SAVED_SEARCHES.md`. |
-| Aplicação web | Em evolução | Login Supabase, kanban, drawer detalhado, configurações e atualização de etapa no banco. |
-| Supabase | Conectado | Projeto e usuários iniciais já criados; credencial de serviço conectada ao n8n. |
-| n8n | Conectado | Credenciais de Supabase, Sheets, Calendar de teste, Gemini e PhantomBuster disponíveis; workflows ainda em montagem. |
-| PhantomBuster | Preparado | Conta de teste conectada ao LinkedIn. A ação de outbound permanece desligada. |
-| Google Sheets | Operacional | Abas de entrada e saída existem; falta ativar o espelho seguro de status. |
-| Google Calendar | Desenhado | Agendamento nativo definido; a agenda de teste será trocada pela do Giulio antes de produção. |
+| Regras comerciais | Definidas | manter versão ativa no banco e refletir mudanças no n8n |
+| Saved searches LinkedIn | Documentadas | configurar Phantoms concretos e seus IDs/inputs |
+| Aplicação web | Parcialmente funcional | conectar comandos, importação, agenda e auditoria real; publicar depois |
+| Login Supabase | Funcional | revisão final de RLS e ambiente de produção |
+| Banco Supabase | Estrutura e migrations aplicadas | importar os leads existentes e validar dados reais |
+| n8n | Credenciais de teste conectadas | construir e testar workflows AGF sem outreach externo |
+| PhantomBuster | Conta/credencial de teste preparada | testar extração por API e validar limites/IDs dos Phantoms |
+| Google Sheets | Abas existentes | concluir ingestão e espelho seguro de status |
+| Google Calendar | Regras definidas | validar appointment schedule de teste e trocar para Giulio antes de produção |
+| Gemini | Credencial conectada no n8n | montar prompt, fontes, validação e saída JSON |
 
-## Regras comerciais vigentes
+## Aplicação web implementada
 
-### Perfil obrigatório
+O código está em `prototype-agf-crm/`. A interface atual possui:
 
-Antes de entrar no CRM, o contato precisa ter localização no Brasil, pelo menos
-100 conexões e ação `Conectar` disponível. Perfil incompleto, inconsistente ou
-sem evidência suficiente é descartado ou enviado à revisão, não ao kanban.
+- login por e-mail e senha do Supabase;
+- Kanban compartilhado com os nove estágios;
+- card expandido com empresa, contato, perfil, contexto, notícias, score, mensagem e histórico;
+- páginas de agenda e histórico;
+- painel de configurações de extração e operação;
+- leitura/escrita de leads e configurações no Supabase quando o ambiente está configurado;
+- rota de servidor protegida para solicitar `Extração extra` ao n8n.
 
-### Pontuação
+O fallback local com leads de demonstração permanece apenas para desenvolvimento. Não deve ser usado como validação de integração ou produção.
 
-`score-base = porte (0–3) + urgência/momento (0–3) + decisor (0–2)`.
+## Banco, critérios e pipeline
 
-- Vagas entram com score-base `>=3`.
-- Middle market entra com score-base `>=5`.
-- Economia real adiciona `+2` fora do eixo Rio–SP, `+1` no eixo e `0` nos
-  demais casos. O score comercial máximo é **10**, mas o bônus não muda o
-  corte técnico.
+As migrations disponíveis já criam o modelo de dados, adicionam `Aprovado`, geram a fila de espelho do Sheets e aplicam a escala comercial de 0 a 10.
 
-### Contato prioritário
+```text
+score-base = porte (0–3) + urgência ou momento (0–3) + decisor (0–2)
+score-comercial = score-base + economia real (0–2), limitado a 10
+```
 
-| Base / porte | Contato preferencial | Fallback |
-|---|---|---|
-| Vagas — grande | líder ou gerente da área da vaga | CEO/CFO/dono se não houver líder aderente validado |
-| Vagas — média/pequena | CEO, CFO ou liderança financeira | líder da área; recrutador por último |
-| Middle — grande | líder ou gerente da área | CEO/CFO/dono se não houver líder aderente validado |
-| Middle — média/pequena | dono, CEO, CFO ou head | liderança financeira relacionada ao sinal |
+Os cortes continuam sobre a base: `Vagas >= 3` e `Middle market >= 5`.
 
-O Giulio é o condutor padrão. Outro sócio só é recomendado com evidência direta
-e excepcional de fit setorial, histórico ou ecossistema.
-
-## Pipeline da aplicação
+Pipeline atual:
 
 `Prontos para enviar → Aprovado → Enviar convite → Convite enviado → Enviar mensagem → Em conversa → Agendamento → Call marcada → Concluído`
 
-- Todos os usuários autenticados veem a mesma base e podem alterar as
-  configurações operacionais.
-- Um card por empresa fica ativo; sinal extremamente forte posterior pode
-  reabrir o histórico com evidência explícita.
-- A etapa atual é gravada no Supabase e será espelhada exclusivamente na coluna
-  `Status CRM` da linha correspondente no Sheets.
-- O card expandido mostra contexto, evidências, composição do score, histórico
-  e rascunho aprovado.
+Hoje, a alteração do card persiste em `leads.current_stage` e gera histórico. A fila de espelho existe no banco, mas o workflow n8n ainda precisa ser concluído e testado.
 
-## Mensagem-base aprovada
+## Regras comerciais que a automação deve respeitar
 
-```text
-{Nome}, tudo bem? Obrigado por aceitar o convite.
+- Perfil: Brasil, 100+ conexões, `Conectar` disponível e perfil utilizável.
+- Economia real: `+2` fora de Rio–SP, `+1` no eixo, `0` para tech pura/sem evidência.
+- Vagas grande: líder/gerente/head da área da vaga; CEO/CFO/dono como fallback permitido.
+- Vagas média/pequena: CEO/CFO/liderança financeira; recrutador é último recurso.
+- Middle grande: líder/gerente/head da área ligada ao sinal; CEO/CFO/dono como fallback permitido.
+- Middle média/pequena: dono/CEO/CFO/head financeiro.
+- Um contato ativo por empresa; sinal extremamente forte pode reabrir histórico com justificativa explícita.
+- Notícias e contexto: somente fatos dos últimos seis meses ligados a finanças, operação ou momento estratégico.
 
-Vi {trigger da empresa}. Imagino que usar AI de verdade no financeiro, sem virar projeto eterno, esteja na pauta aí também.
+## Automação externa
 
-Montei a AGF exatamente para isso. Contamos com profissionais das melhores consultorias do Brasil, que atuam no dia a dia da empresa, do operacional ao estratégico, criando automações no caminho.
+Nenhum convite, mensagem, InMail ou agendamento automático está ativo em produção.
 
-Eu venho de 10+ anos entre banking e corporate development, e fundei uma empresa na qual levantei recursos com investidores institucionais.
+Quando forem habilitados:
 
-Topa 15-30 minutos para eu me apresentar rapidamente?
-```
+- Giulio revisa antes de qualquer envio;
+- execução fica entre 09:00 e 20:00;
+- 20 abordagens/dia é alerta, não bloqueio rígido;
+- respostas LinkedIn são conduzidas manualmente;
+- `Agendamento` envia o link do Google Calendar;
+- o booking cria Meet, preenche horário no card e move para `Call marcada`;
+- o primeiro piloto usa apenas sócios autorizados.
 
-## Agendamento
+## Próxima sequência de trabalho
 
-No estágio `Agendamento`, o lead recebe o link do agendamento nativo do Google
-Calendar. A pessoa escolhe um slot de 30 minutos disponível entre 09:00 e
-20:00, com início apenas em `:00`, `:15`, `:30` ou `:45`. O Calendar cria Meet,
-reserva a agenda e envia confirmação. O título será:
+1. concluir o espelho `Supabase → Sheets` e testar Vagas/Middle;
+2. importar os leads existentes, preservando origem, aba e linha;
+3. configurar/testar Phantoms de extração sem outbound;
+4. implementar ingestão, filtros, deduplicação, score, Gemini e upsert;
+5. conectar extração agendada/manual às configurações do CRM;
+6. validar agenda nativa de teste e retorno de booking;
+7. testar ponta a ponta com os sócios antes de qualquer outreach externo.
 
-`AGF - Giulio / Empresa - Nome do lead`
-
-## Próximos passos de construção
-
-1. Aplicar a migration de score 0–10 no Supabase.
-2. Concluir e testar o workflow de espelho de status para Vagas e Middle.
-3. Construir o workflow de ingestão: Sheets → filtros → Gemini → Supabase.
-4. Ligar o botão de extração extra ao Webhook seguro do n8n.
-5. Preparar os workflows inativos de convite/mensagem e agendamento.
-6. Realizar piloto com os sócios e somente depois avaliar ativação de outreach.
-
-Detalhes de payloads e de montagem dos workflows estão em
-`docs/N8N_INTEGRATION_CONTRACT.md`.
+O contrato de dados e os payloads de workflows estão em [N8N_INTEGRATION_CONTRACT.md](./N8N_INTEGRATION_CONTRACT.md).

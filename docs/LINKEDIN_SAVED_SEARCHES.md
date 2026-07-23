@@ -1,6 +1,6 @@
 # AGF — filtros e saved searches do LinkedIn
 
-**Atualizado em:** 21 de julho de 2026  
+**Atualizado em:** 22 de julho de 2026
 **Escopo:** prospecção de implementação de IA em finanças corporativas. As buscas abaixo alimentam apenas as bases `Vagas — leads quentes` e `Middle market — prospecção proativa`.
 
 ## 1. Regras que valem para qualquer busca
@@ -59,7 +59,7 @@ Após escolher a empresa, usar a busca de pessoas com **Empresa atual = empresa 
 
 1. Combinar o domínio da vaga com: `gerente OR manager OR head OR líder OR coordenador OR diretor`. Exemplos: `FP&A gerente`, `tesouraria head`, `RGM manager`, `controladoria coordenador`.
 2. Escolher somente o líder que seja diretamente responsável pela área da vaga e passe a validação de perfil.
-3. Se não houver perfil aderente validado, marcar `Revisar manualmente`; não substituir por CEO/CFO.
+3. Se não houver perfil aderente validado, buscar CEO, CFO ou dono como fallback e registrar a justificativa no lead.
 
 **Empresa média ou menor (`Porte 1–2`)**
 
@@ -115,7 +115,15 @@ Usar somente fatos de até seis meses. A fonte precisa ser registrada na planilh
 
 ### 3.4 Saved search de Pessoas — contato de Middle market
 
-Depois de confirmar empresa e sinal, aplicar **Empresa atual = empresa selecionada** e buscar nesta ordem:
+Depois de confirmar empresa e sinal, aplicar **Empresa atual = empresa selecionada**. A ordem depende do porte:
+
+**Empresa grande (`Porte 3`)**
+
+1. Combinar o tema do sinal com `gerente OR manager OR head OR líder OR coordenador OR diretor`. Exemplos: `controladoria head`, `FP&A manager`, `tesouraria diretor`.
+2. Escolher o líder que responda diretamente pela área financeira ligada ao sinal e passe na validação de perfil.
+3. Se não houver líder aderente validado, buscar `CEO OR dono OR fundador OR sócio OR Presidente` e depois `CFO OR "Chief Financial Officer" OR "Diretor Financeiro" OR "VP Financeiro"` como fallback, com justificativa registrada.
+
+**Empresa média ou menor (`Porte 1–2`)**
 
 1. `CEO OR dono OR fundador OR sócio OR Presidente OR "Diretor Presidente"`
 2. `CFO OR "Chief Financial Officer" OR "Diretor Financeiro" OR "VP Financeiro"`
