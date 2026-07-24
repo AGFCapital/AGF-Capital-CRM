@@ -1,35 +1,38 @@
-# Setup local
+# Setup local do CRM AGF
 
 ## 1. Banco
 
-Em um projeto novo, aplique as migrations históricas em ordem e, por último, a
-migration de transição:
+Em uma base nova, aplique todas as migrations em ordem de nome. Para a versao
+manual atual, a ultima e:
 
-1. `20260722000100_initial_agf_crm.sql`
-2. `20260722000200_pipeline_and_sheet_sync.sql`
-3. `20260722000300_sheet_status_sync.sql`
-4. `20260722000400_score_to_ten.sql`
-5. `20260723000500_stage_zero_schema_alignment.sql`
+`../supabase/migrations/20260724000100_manual_crm_operations.sql`
 
-As referências a Sheets nas migrations 001 e 003 são histórico imutável. A
-migration 005 remove esses objetos do schema corrente.
-
-O rollback da 005 é somente para teste vazio:
-
-`../supabase/rollbacks/20260723000500_stage_zero_schema_alignment.rollback.sql`
+Ela depende da transicao de schema da Etapa 0 e cria follow-ups, projetos e a
+configuracao publica de agenda.
 
 ## 2. Ambiente
 
-Copie `.env.example` para `.env.local` e configure apenas a URL e a chave
-publicável do Supabase, além do webhook interno do n8n quando necessário.
+Copie `.env.example` para `.env.local` e informe somente:
 
-Nunca exponha `service_role`, PhantomBuster ou credenciais de IA.
+```text
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
+```
 
-## 3. Execução
+O browser nunca recebe `service_role`, token do n8n, token do PhantomBuster ou
+chave de IA.
+
+## 3. Executar
 
 ```powershell
 node .\prototype-agf-crm\server.mjs
 ```
 
-Sem Supabase configurado, a aplicação exibe erro. Não existe base local de
-demonstração.
+Abra `http://localhost:4173`.
+
+## 4. Configurar a agenda
+
+Depois de entrar, abra **Configuracoes** e salve o link publico da pagina de
+agendamento. O link e exibido na mensagem copiada no card. O callback do
+Calendar para `calendar_bookings` deve ser implementado no n8n conforme
+`../docs/N8N_CALENDAR_CALLBACK_CONTRACT.md`.

@@ -1,11 +1,9 @@
-# Interface AGF CRM
+# Interface do CRM AGF
 
-Frontend compartilhado do CRM da AGF. A interface usa autenticação e dados do
-Supabase; não possui seeds nem base alternativa em `localStorage`.
+Esta pasta contem a aplicacao web do CRM. Ela usa apenas Supabase no browser e
+nao possui seed, fallback de leads ou credencial sensivel no frontend.
 
-## Executar
-
-Na raiz do repositório:
+## Rodar localmente
 
 ```powershell
 node .\prototype-agf-crm\server.mjs
@@ -13,30 +11,24 @@ node .\prototype-agf-crm\server.mjs
 
 Abra `http://localhost:4173`.
 
-Copie `.env.example` para `.env.local` e configure:
+Crie `prototype-agf-crm/.env.local` a partir de `.env.example` com a URL e a
+chave publicavel do Supabase. Nunca use `service_role` neste arquivo.
 
-```text
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
-N8N_COMMAND_WEBHOOK_URL=https://seu-n8n/webhook/...
-N8N_COMMAND_WEBHOOK_TOKEN=segredo-interno-do-webhook
-```
+## O que a interface faz
 
-Nunca coloque a chave `service_role`, tokens do PhantomBuster ou chaves de IA
-no frontend.
+- opera o Kanban de leads ja existentes;
+- guia convite, aceite, mensagem e agendamento manuais no LinkedIn;
+- registra follow-ups e projetos comerciais;
+- exibe chamadas devolvidas pelo Google Calendar/n8n;
+- permite configurar o link publico da agenda.
 
-## Pipeline exibido
+## O que ela nao faz
 
-`qualificado → aprovado → convite_enviado → conexao_aceita →
-mensagem_enviada → em_conversa → agendamento → call_marcada → concluido`
+- nao extrai leads;
+- nao chama Apollo, PhantomBuster, Gemini, LinkedIn ou planilhas;
+- nao envia convite nem mensagem automaticamente;
+- nao contem credencial do n8n.
 
-Também são exibidos `revisao_manual`, `convite_expirado` e `descartado`.
-
-Contexto e notícias são derivados de `lead_signals` verificados. Os campos
-legados `leads.signal_summary` e `leads.recent_news` não são utilizados.
-
-## Estado desta versão
-
-Esta pasta está alinhada somente à Etapa 0. Workflows de ingestão, convite,
-detecção de aceite e agendamento pertencem às etapas seguintes e não foram
-implementados aqui.
+A migration `../supabase/migrations/20260724000100_manual_crm_operations.sql`
+precisa estar aplicada para os recursos de follow-up, projetos e configuracao
+de agenda funcionarem no banco remoto.
