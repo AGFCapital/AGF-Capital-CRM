@@ -4,9 +4,17 @@ Atualizado em 23 de julho de 2026.
 
 ## Marco atual
 
-**Etapa 0 implementada no repositório.**
+**Etapa 0 aplicada. Etapa 1 concluída. Etapa 2 redesenhada e aguardando
+aprovação antes da implementação.**
 
-Nenhuma atividade da Etapa 1 foi iniciada.
+O importador isolado gravou 60 leads em uma transação. Todos estão em
+`revisao_manual`, nenhum `lead_signals` foi criado e o importador foi
+arquivado.
+
+A descoberta Middle market não usará Brave nem outra API paga de busca. O
+plano atual começa em rankings setoriais e regionais publicados, mede porte,
+complexidade operacional, geografia e densidade da função financeira no
+LinkedIn. Notícia passa a ser contexto opcional.
 
 ## Arquitetura vigente
 
@@ -27,9 +35,9 @@ operacional. A planilha legada será lida uma única vez na Etapa 1.
 - `import_origin` desacoplado da planilha;
 - sinais verificados normalizados em `lead_signals`;
 - remoção de `signal_summary`, `recent_news` e `strength`;
-- configurações `outreach.enabled` e `outreach.dry_run`;
+- configurações `outreach.enabled = false` e `outreach.dry_run = true`;
 - dry-run ativo por padrão;
-- idempotência de dispatch por conteúdo nos status ativos;
+- idempotência por conteúdo para mensagem/booking e por lead para convite;
 - suporte a reservas unmatched com `raw_payload`;
 - templates de convite com corpo imutável após aprovação e RLS administrativa;
 - tabelas `connection_sync_runs` e `outreach_metrics`;
@@ -47,6 +55,20 @@ operacional. A planilha legada será lida uma única vez na Etapa 1.
 | Calendly/Cal.com | modelo de dados preparado; provedor/plano ainda pendente |
 | LinkedIn | nenhum convite ou mensagem real habilitado |
 
+## Etapa 2 — plano revisado
+
+- descoberta por documentos de ranking e associações, não por notícia;
+- faturamento publicado é evidência obrigatória;
+- score estrutural proposto de 0 a 10;
+- densidade do time financeiro medida por buscas determinísticas no LinkedIn;
+- ausência só pontua quando a cobertura da busca estiver completa;
+- ação `Re-qualificar` reaproveita os 60 cards existentes;
+- notícia não qualifica nem desqualifica;
+- Gemini recebe apenas fatos previamente verificados e não propõe URLs;
+- nenhum workflow, parser ou migration dessa etapa foi implementado.
+
+O plano completo está em `docs/ETAPA_2_SOURCE_VERIFICATION_PLAN.md`.
+
 ## Travas vigentes
 
 - InMail está fora do produto.
@@ -57,14 +79,18 @@ operacional. A planilha legada será lida uma única vez na Etapa 1.
 - Um fato sem `source_url` e `verified_at` não aparece como evidência verificada.
 - Importação com estágio ausente ou inválido falha explicitamente.
 
-## Próxima etapa — não iniciada
+## Etapa 1 — concluída
 
-Etapa 1: importação única dos leads legados.
+Resultado verificado diretamente no Supabase:
 
-Antes de executá-la, o importador deverá:
+- empresas: 60;
+- contatos: 60;
+- leads: 60;
+- em `revisao_manual`: 60;
+- duplicatas por empresa normalizada: 0;
+- duplicatas por LinkedIn normalizado: 0;
+- sobreposição de empresa entre `vacancy` e `middle_market`: 0;
+- `lead_signals` criados: 0.
 
-- mapear apenas valores exatos de estágio;
-- falhar em valores ausentes ou desconhecidos;
-- registrar `import_origin`;
-- verificar todos os leads da empresa e do contato para deduplicação;
-- aplicar uma regra explícita de reabertura.
+O relatório e a evidência da carga estão em
+`outputs/legacy-leads-import/`. O importador arquivado recusa nova execução.

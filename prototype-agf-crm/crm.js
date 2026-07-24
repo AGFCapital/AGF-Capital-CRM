@@ -33,7 +33,7 @@ const defaultSettings = {
   sendStart: "09:00",
   sendEnd: "20:00",
   dailyAlertAt: 20,
-  outreachEnabled: true,
+  outreachEnabled: false,
   outreachDryRun: true,
   callDuration: 30,
   slotInterval: 15,
@@ -289,7 +289,7 @@ function settingsModal() {
     <header><div><p class="eyebrow">ADMINISTRACAO</p><h2>Configuracoes da operacao</h2><p>Todos os operadores com acesso podem ajustar estes parametros.</p></div><button data-action="close-settings" aria-label="Fechar">x</button></header>
     <form id="settings-form">
       <section><div><h3>Extracao de leads</h3><p>Somente contatos aprovados pelos filtros entram no CRM.</p></div><label class="switch"><input name="extractionEnabled" type="checkbox" ${setting.extractionEnabled ? "checked" : ""}><span></span> Rotina automatica</label><div class="field-grid"><label>Horario<input name="extractionTime" type="time" value="${setting.extractionTime}"></label><label>Vagas<input name="vacancyCount" type="number" min="1" value="${setting.vacancyCount}"></label><label>Middle market<input name="middleMarketCount" type="number" min="1" value="${setting.middleMarketCount}"></label></div></section>
-      <section><div><h3>Convites</h3><p>O dry-run impede qualquer chamada real ao PhantomBuster.</p></div><label class="switch"><input name="outreachEnabled" type="checkbox" ${setting.outreachEnabled ? "checked" : ""}><span></span> Rotina habilitada</label><label class="switch"><input name="outreachDryRun" type="checkbox" ${setting.outreachDryRun ? "checked" : ""}><span></span> Dry-run ativo</label><div class="field-grid"><label>Inicio<input name="sendStart" type="time" value="${setting.sendStart}"></label><label>Fim<input name="sendEnd" type="time" value="${setting.sendEnd}"></label><label>Alerta diario<input name="dailyAlertAt" type="number" min="1" value="${setting.dailyAlertAt}"></label></div></section>
+      <section><div><h3>Convites</h3><p>O n8n controla habilitação e dry-run. O painel continua alterando apenas a janela e o alerta operacional.</p></div><div class="field-grid"><label>Automação<input type="text" value="${setting.outreachEnabled ? "Habilitada" : "Desabilitada"}" readonly></label><label>Modo<input type="text" value="${setting.outreachDryRun ? "Dry-run" : "Produção"}" readonly></label><label>Inicio<input name="sendStart" type="time" value="${setting.sendStart}"></label><label>Fim<input name="sendEnd" type="time" value="${setting.sendEnd}"></label><label>Alerta diario<input name="dailyAlertAt" type="number" min="1" value="${setting.dailyAlertAt}"></label></div></section>
       <section><div><h3>Calls</h3><p>Slots de 30 minutos, em :00, :15, :30 ou :45.</p></div><div class="field-grid"><label>Duracao<input type="number" value="${setting.callDuration}" readonly></label><label>Intervalo<input type="number" value="${setting.slotInterval}" readonly></label></div></section>
       <footer><button type="button" class="button secondary" data-action="close-settings">Cancelar</button><button type="submit" class="button primary">Salvar configuracoes</button></footer>
     </form>
@@ -408,7 +408,7 @@ function bindEvents() {
   }));
   document.querySelector("#settings-form")?.addEventListener("submit", async (event) => {
     event.preventDefault(); const values = new FormData(event.currentTarget);
-    state.settings = { ...state.settings, extractionEnabled: values.get("extractionEnabled") === "on", extractionTime: values.get("extractionTime"), vacancyCount: Number(values.get("vacancyCount")), middleMarketCount: Number(values.get("middleMarketCount")), outreachEnabled: values.get("outreachEnabled") === "on", outreachDryRun: values.get("outreachDryRun") === "on", sendStart: values.get("sendStart"), sendEnd: values.get("sendEnd"), dailyAlertAt: Number(values.get("dailyAlertAt")) };
+    state.settings = { ...state.settings, extractionEnabled: values.get("extractionEnabled") === "on", extractionTime: values.get("extractionTime"), vacancyCount: Number(values.get("vacancyCount")), middleMarketCount: Number(values.get("middleMarketCount")), sendStart: values.get("sendStart"), sendEnd: values.get("sendEnd"), dailyAlertAt: Number(values.get("dailyAlertAt")) };
     try {
       if (state.remote.enabled) await saveRemoteSettings();
       state.settingsOpen = false; render(); toast("Configuracoes salvas no Supabase.");
@@ -425,11 +425,9 @@ function bindEvents() {
 async function saveRemoteSettings() {
   const extraction = { enabled: state.settings.extractionEnabled, time: state.settings.extractionTime, timezone: "America/Sao_Paulo", weekdays: [1, 2, 3, 4, 5], vacancy_count: state.settings.vacancyCount, middle_market_count: state.settings.middleMarketCount };
   const outbound = { start: state.settings.sendStart, end: state.settings.sendEnd, timezone: "America/Sao_Paulo", daily_alert_at: state.settings.dailyAlertAt };
-  const outreach = { enabled: state.settings.outreachEnabled, dry_run: state.settings.outreachDryRun };
   await Promise.all([
     supabaseRequest("/rest/v1/app_settings?setting_key=eq.lead_extraction", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: extraction }) }),
     supabaseRequest("/rest/v1/app_settings?setting_key=eq.outbound", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: outbound }) }),
-    supabaseRequest("/rest/v1/app_settings?setting_key=eq.outreach", { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ value: outreach }) }),
   ]);
 }
 

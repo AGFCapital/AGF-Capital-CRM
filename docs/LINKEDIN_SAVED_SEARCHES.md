@@ -1,6 +1,6 @@
 # AGF — filtros e saved searches do LinkedIn
 
-**Atualizado em:** 22 de julho de 2026
+**Atualizado em:** 23 de julho de 2026
 **Escopo:** prospecção de implementação de IA em finanças corporativas. As buscas abaixo alimentam apenas as bases `Vagas — leads quentes` e `Middle market — prospecção proativa`.
 
 ## 1. Regras que valem para qualquer busca
@@ -9,7 +9,9 @@
 2. **Um contato por empresa:** em `Vagas` de empresa grande, priorizar o líder direto da área da vaga; em `Vagas` de empresa média ou menor, CEO/CFO. Em `Middle market`, priorizar dono/CEO, CFO ou head da área financeira relevante. Não usar C-level como atalho para empresa grande com vaga aberta.
 3. **Sem duplicidade ativa:** procurar empresa e pessoa nas bases antes de criar nova linha. Lead já abordado só volta mediante sinal extremamente forte novo, com histórico visível.
 4. **Checagem de perfil antes de listar:** Brasil + 100 ou mais conexões + ação `Conectar` disponível. Sem evidência clara, marcar `Revisar manualmente` e não incluir automaticamente.
-5. **Notícias e gatilhos:** apenas fatos dos últimos seis meses, ligados a finanças ou ao momento financeiro/operacional da empresa.
+5. **Evidência estrutural em Middle market:** faturamento publicado,
+complexidade operacional, sede e contagem da função financeira precisam ser
+rastreáveis. Notícia é contexto opcional, nunca requisito de qualificação.
 6. **Economia real:** é prioridade comercial. Aplicar bônus de entrada após o score-base: `+2` fora do eixo Rio–SP, `+1` no eixo e `0` para tech pura/serviços financeiros/sem evidência suficiente.
 
 > Não usar filtro que descarte `Júnior`. Excluir apenas `Estágio` e `Trainee`.
@@ -47,7 +49,8 @@ Salvar as buscas abaixo no LinkedIn Jobs. Se a interface não aceitar toda a exp
 1. Abrir a vaga e registrar empresa, cargo, data/publicação e URL.
 2. Classificar o porte: se for grande (`Porte 3`), buscar primeiro o gerente/head/coordenador líder/diretor da área indicada na vaga. Se for média ou menor (`Porte 1–2`), buscar primeiro CFO ou CEO.
 3. Fazer a validação de perfil obrigatória.
-4. Verificar porte e um contexto/notícia recente de até seis meses.
+4. Verificar porte. Contexto/notícia recente é opcional para Vagas e não
+substitui a evidência da própria vaga.
 5. Aplicar: Porte (0–3), Urgência (0–3), Decisor (0–2). A entrada exige total-base `≥3`.
 6. Aplicar bônus de economia real e calcular score comercial.
 
@@ -81,46 +84,56 @@ O contato escolhido precisa passar pela validação de perfil antes de ser regis
 | Faixa de exceção | `51–200` apenas quando houver boa evidência de receita entre R$ 50 mi e R$ 500 mi ou operação física complexa. |
 | Setor | Priorizar economia real. Tech não é excluída, mas não recebe bônus de entrada. |
 | Vaga aberta | Não é requisito. |
-| Corte técnico | Total-base `≥5` antes do bônus comercial. |
+| Corte técnico | Score estrutural proposto `≥7`, sujeito à calibração com os 60 leads legados. |
 
-O porte no LinkedIn é proxy. Validar também receita publicada, porte operacional, presença regional, empresas controladas, escala de capex ou outra evidência pública quando disponível.
+O LinkedIn não é a fonte de descoberta dessas empresas. A lista nasce em
+rankings setoriais e regionais aprovados. O LinkedIn é usado depois para
+confirmar a empresa, contar funcionários, medir a função financeira e localizar
+o contato.
 
-### 3.2 Saved searches de Empresas — economia real
+### 3.2 Verticais originadas nos rankings
 
-Salvar uma busca por vertical para facilitar o recorte e evitar lista genérica de empresas.
+Os nomes abaixo deixam de ser saved searches de descoberta no LinkedIn e
+passam a ser classificações operacionais das empresas importadas dos rankings.
 
-| Nome da saved search | Filtros de setor / palavras-chave | Prioridade de região | O que validar em seguida |
+| Nome operacional | Classificação / palavras-chave | Prioridade de região | O que validar em seguida |
 |---|---|---|---|
-| `MM-01 — Logística e Distribuição` | `logística`, `transportes`, `armazenagem`, `distribuição`, `supply chain`, `terminal` | Centro-Oeste, Sul, Nordeste e interior de SP/MG/PR/RS | Capex, expansão de capacidade, nova filial, dívida e eficiência de caixa. |
-| `MM-02 — Indústria e Bens de Consumo` | `indústria`, `manufatura`, `alimentos`, `bebidas`, `ingredientes`, `cosméticos`, `química`, `móveis` | Nacional, com prioridade fora do eixo | Receita, novas linhas/unidades, margens, aquisição e profissionalização financeira. |
-| `MM-03 — Agro e Insumos` | `agronegócio`, `insumos agrícolas`, `fertilizantes`, `sementes`, `proteção de cultivos`, `cooperativa` | Centro-Oeste, Sul e interior de SP/MG | Safra, resultado, investimento, crédito, estoque, expansão regional e RI. |
-| `MM-04 — Varejo, Atacado e Franquias` | `varejo`, `atacado`, `franquias`, `supermercados`, `distribuidora`, `consumer goods` | Capitais regionais e cidades-polo fora do eixo | Abertura de lojas/unidades, crescimento de rede, margem, expansão de canais e eficiência. |
-| `MM-05 — Saúde e Serviços Operacionais` | `saúde`, `hospitais`, `clínicas`, `laboratórios`, `odontologia`, `distribuição hospitalar` | Nacional, com prioridade fora do eixo | Expansão de unidades, integração, mudança de CFO, caixa, custo e escala operacional. |
-| `MM-06 — Infraestrutura, Energia e Construção` | `infraestrutura`, `energia`, `construção`, `engenharia`, `saneamento`, `concessão` | Nacional, com prioridade fora do eixo | Capex, concessões, obras, dívida/debênture, resultado, turnaround e M&A. |
-| `MM-07 — Imobiliário e Serviços Imobiliários` | `incorporadora`, `imobiliário`, `corretagem`, `real estate`, `loteamento` | Nacional, com prioridade fora do eixo | Lançamentos, VGV, novas lojas, captação, dívida e vendas. |
+| `MM-01 — Logística e Distribuição` | `logística`, `transportes`, `armazenagem`, `distribuição`, `supply chain`, `terminal` | Centro-Oeste, Sul, Nordeste e interior | receita, filiais, armazéns, CDs, frota e presença territorial |
+| `MM-02 — Indústria e Bens de Consumo` | `indústria`, `manufatura`, `alimentos`, `bebidas`, `ingredientes`, `cosméticos`, `química`, `móveis` | Nacional, com prioridade fora do eixo | receita, fábricas, unidades e presença regional |
+| `MM-03 — Agro e Insumos` | `agronegócio`, `insumos agrícolas`, `fertilizantes`, `sementes`, `proteção de cultivos`, `cooperativa` | Centro-Oeste, Sul e interior | receita, unidades, CDs, cooperados e abrangência |
+| `MM-04 — Varejo e Atacado` | `varejo`, `atacado`, `supermercados`, `distribuidora`, `consumer goods` | Capitais regionais e cidades-polo fora do eixo | receita, lojas, CDs, funcionários e estados atendidos |
+| `MM-05 — Saúde` | `saúde`, `hospitais`, `clínicas`, `laboratórios`, `distribuição hospitalar` | Nacional, com prioridade fora do eixo | receita, hospitais, unidades e leitos |
+| `MM-06 — Infraestrutura e Construção` | `infraestrutura`, `construção`, `engenharia`, `saneamento`, `concessão` | Nacional, com prioridade fora do eixo | receita, obras, área construída e unidades |
+| `MM-07 — Imobiliário` | `incorporadora`, `imobiliário`, `real estate`, `loteamento` | Nacional, com prioridade fora do eixo | receita, lançamentos, unidades e presença regional |
 
-### 3.3 Saved searches de sinais financeiros e operacionais
+### 3.3 Saved searches de Pessoas — densidade financeira
 
-Rodar em conteúdo, posts, notícias da empresa e busca web direcionada. Salvar as consultas por família de sinal; juntar o nome da empresa quando estiver na etapa de confirmação.
+Depois de vincular a página correta da companhia, rodar quatro buscas com
+**Empresa atual = empresa selecionada**:
 
-| Nome da saved search | Termos de sinal |
+| Nome | Termos |
 |---|---|
-| `SIG-01 — Resultados e eficiência` | `resultados`, `receita`, `EBITDA`, `lucro`, `margem`, `eficiência`, `recuperação`, `turnaround` |
-| `SIG-02 — Expansão e capacidade` | `expansão`, `nova unidade`, `novo centro de distribuição`, `capex`, `investimento`, `ampliação`, `nova fábrica` |
-| `SIG-03 — Capital e dívida` | `debêntures`, `dívida`, `financiamento`, `FIDC`, `captação`, `crédito`, `capital de giro` |
-| `SIG-04 — M&A e integração` | `aquisição`, `M&A`, `integração`, `joint venture`, `compra`, `consolidação` |
-| `SIG-05 — Liderança financeira` | `CFO`, `diretor financeiro`, `VP financeiro`, `RI`, `relações com investidores`, `novo CEO` |
+| `FIN-ALL — Função financeira` | `finance OR financeiro OR finanças OR controladoria OR controllership OR contabilidade OR accounting OR tesouraria OR treasury OR FP&A OR "financial planning" OR "corporate finance"` |
+| `FIN-CFO — Liderança financeira` | `CFO OR "chief financial officer" OR "diretor financeiro" OR "VP financeiro" OR "head de finanças"` |
+| `FIN-FPA — Planejamento financeiro` | `FP&A OR "planejamento financeiro" OR "financial planning"` |
+| `FIN-RI — Relações com investidores` | `"relações com investidores" OR "investor relations" OR RI` |
 
-Usar somente fatos de até seis meses. A fonte precisa ser registrada na planilha: RI, site da empresa, release, imprensa setorial, jornal regional ou LinkedIn oficial da empresa/executivo quando não houver fonte melhor.
+Registrar a URL da busca, total exibido, perfis extraídos, execução do Phantom,
+data/hora da coleta e eventual limite. Deduplicar pela URL do perfil e manter
+apenas vínculo atual. Se qualquer busca falhar ou atingir limite, a densidade
+fica desconhecida; ausência não pode ser presumida.
 
 ### 3.4 Saved search de Pessoas — contato de Middle market
 
-Depois de confirmar empresa e sinal, aplicar **Empresa atual = empresa selecionada**. A ordem depende do porte:
+Depois de confirmar a empresa estruturalmente, aplicar **Empresa atual =
+empresa selecionada**. A ordem depende do porte:
 
 **Empresa grande (`Porte 3`)**
 
-1. Combinar o tema do sinal com `gerente OR manager OR head OR líder OR coordenador OR diretor`. Exemplos: `controladoria head`, `FP&A manager`, `tesouraria diretor`.
-2. Escolher o líder que responda diretamente pela área financeira ligada ao sinal e passe na validação de perfil.
+1. Buscar `gerente OR manager OR head OR líder OR coordenador OR diretor`
+com termos de finanças, controladoria, FP&A ou tesouraria.
+2. Escolher o líder da função financeira mais aderente e que passe na
+validação de perfil.
 3. Se não houver líder aderente validado, buscar `CEO OR dono OR fundador OR sócio OR Presidente` e depois `CFO OR "Chief Financial Officer" OR "Diretor Financeiro" OR "VP Financeiro"` como fallback, com justificativa registrada.
 
 **Empresa média ou menor (`Porte 1–2`)**
@@ -130,16 +143,23 @@ Depois de confirmar empresa e sinal, aplicar **Empresa atual = empresa seleciona
 3. `"Head de Finanças" OR "Head de FP&A" OR "Head de Planejamento" OR "Head de Controladoria" OR Controller`
 4. `"Diretor de RI" OR "Relações com Investidores" OR "Diretor de Planejamento"`
 
-Gestor/recrutador não é o fallback padrão em Middle market; gerente, diretor ou RI sem decisão direta só entram se não for possível identificar dono/CEO, CFO ou head de área e houver sinal muito forte.
+Gestor/recrutador não é o fallback padrão em Middle market; gerente, diretor
+ou RI sem decisão direta só entram se não for possível identificar dono/CEO,
+CFO ou head de área e o score estrutural for muito alto.
 
 ## 4. Checklist final antes de criar a linha
 
 - [ ] Empresa não está duplicada na base ativa.
-- [ ] Existe um sinal de vaga ou de momento financeiro/operacional verificável.
-- [ ] Sinal/notícia tem no máximo seis meses.
+- [ ] Em Vagas, a vaga está registrada; em Middle market, o faturamento
+publicado está verificado em ranking ou fonte aceita.
+- [ ] Complexidade operacional, geografia e coleta do LinkedIn têm fonte e
+data.
+- [ ] A cobertura da busca financeira está completa ou o lead foi enviado
+explicitamente para revisão manual.
 - [ ] Contato segue a regra de porte: líder da área em Vagas grandes; CEO/CFO em Vagas médias/menores; dono, CFO ou head de área em Middle market.
 - [ ] Perfil mostra Brasil, 100+ conexões e `Conectar` disponível.
-- [ ] Score-base alcança o corte da base.
+- [ ] Score de Vagas ou score estrutural de Middle market alcança o corte da
+base.
 - [ ] Bônus de economia real foi classificado e justificado.
 - [ ] Fonte e URL foram registradas.
 - [ ] Rascunho segue o modelo fixo do Giulio.

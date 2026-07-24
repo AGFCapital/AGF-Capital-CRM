@@ -1,4 +1,4 @@
--- Rollback de teste para 20260723_005_stage_zero_schema_alignment.sql.
+-- Rollback de teste para 20260723000500_stage_zero_schema_alignment.sql.
 -- Por remover campos verificados e estados sem equivalente no pipeline antigo,
 -- o rollback é deliberadamente bloqueado quando já existem leads.
 
@@ -27,6 +27,22 @@ drop table if exists public.invite_note_templates;
 
 delete from public.app_settings where setting_key = 'outreach';
 
+drop policy if exists "authenticated users read settings"
+  on public.app_settings;
+drop policy if exists "authenticated users update non-outreach settings"
+  on public.app_settings;
+create policy "authenticated users manage settings"
+  on public.app_settings for all to authenticated
+  using (true) with check (true);
+
+drop policy if exists "authenticated users read dispatches"
+  on public.dispatches;
+drop policy if exists "authenticated users record manual linkedin messages"
+  on public.dispatches;
+create policy "authenticated users manage dispatches"
+  on public.dispatches for all to authenticated
+  using (true) with check (true);
+
 drop index if exists public.calendar_bookings_match_status_idx;
 alter table public.calendar_bookings
   drop constraint if exists calendar_bookings_match_requires_lead_check,
@@ -42,7 +58,8 @@ alter table public.calendar_bookings alter column lead_id set not null;
 alter table public.calendar_bookings add constraint calendar_bookings_lead_id_key unique (lead_id);
 
 drop index if exists public.dispatches_connection_invites_sent_at_idx;
-drop index if exists public.dispatches_one_active_content_idx;
+drop index if exists public.dispatches_one_connection_invite_idx;
+drop index if exists public.dispatches_manual_content_active_idx;
 drop index if exists public.dispatches_pending_idx;
 alter table public.dispatches
   drop constraint if exists dispatches_channel_check,

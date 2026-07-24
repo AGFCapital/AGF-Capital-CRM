@@ -87,7 +87,7 @@ republicado recentemente não se torna um sinal recente.
 
 ```json
 {
-  "enabled": true,
+  "enabled": false,
   "dry_run": true
 }
 ```
@@ -105,14 +105,46 @@ O limite semanal de 100 convites deve ser calculado por query direta em
 `outreach_metrics.weekly_invite_count` é informativo. Ele nunca substitui a
 query de segurança.
 
-Dispatches ativos são únicos por:
+Mensagens e booking ativos são únicos por:
 
 ```text
 (lead_id, action, content_hash)
 ```
 
-Para esse índice, os status ativos são `queued` e `requested`. `simulated`
-representa uma avaliação dry-run e não bloqueia um envio real posterior.
+Para esse índice, os status ativos são `queued` e `requested`.
+
+Convites têm uma regra independente: existe no máximo um
+`connection_invite` por `lead_id` quando o status é `queued`, `requested` ou
+`sent`, independentemente do conteúdo da nota. Somente cancelar ou marcar o
+dispatch como `failed` permite reconvidar. `simulated` representa uma avaliação
+dry-run e não bloqueia um envio real posterior.
+
+O hash é calculado com a função nativa `sha256()` sobre o payload e a ação,
+sem depender de `digest()` ou do `search_path` de `pgcrypto`.
+
+## RLS revisada
+
+Todos os usuários autenticados mantêm leitura de `app_settings` e
+`dispatches`.
+
+- `app_settings`: o cliente pode atualizar qualquer linha exceto `outreach`;
+  habilitação e dry-run são exclusivos do backend/n8n.
+- `dispatches`: o cliente só pode inserir o registro de uma mensagem manual já
+  enviada: `linkedin_message`, canal `manual`, status `sent`.
+- connection invite e qualquer status `queued` são exclusivos do backend/n8n.
+
+As outras tabelas que ainda possuem política `ALL` para `authenticated` e não
+foram alteradas nesta etapa são:
+
+- `criteria_versions`
+- `extraction_runs`
+- `companies`
+- `contacts`
+- `leads`
+- `lead_signals`
+- `message_drafts`
+- `calendar_bookings`
+- `lead_activities`
 
 ## Templates de convite
 
@@ -120,7 +152,8 @@ Um template aprovado:
 
 - pode ser lido por usuários autenticados;
 - só pode ser criado, aprovado, ativado ou desativado por administrador;
-- não pode ter o corpo alterado;
+- não pode ter corpo nem `variables` alterados;
+- não pode ter `approved_at` apagado;
 - não pode ser apagado.
 
 Uma edição deve criar outra linha, inicialmente inativa. Templates não

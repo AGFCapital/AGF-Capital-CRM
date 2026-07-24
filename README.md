@@ -53,8 +53,8 @@ causa erro explícito; não existe conversão por aproximação.
 As migrations históricas permanecem intactas. A transição do contrato v1 para
 o v2 está em:
 
-- `supabase/migrations/20260723_005_stage_zero_schema_alignment.sql`
-- `supabase/migrations/20260723_005_stage_zero_schema_alignment.rollback.sql`
+- `supabase/migrations/20260723000500_stage_zero_schema_alignment.sql`
+- `supabase/rollbacks/20260723000500_stage_zero_schema_alignment.rollback.sql`
 
 O rollback é destinado a um banco de teste vazio e se recusa a executar quando
 existem leads, evitando perda silenciosa de estados ou sinais verificados.
@@ -65,7 +65,7 @@ As configurações ficam na linha `app_settings.setting_key = 'outreach'`:
 
 ```json
 {
-  "enabled": true,
+  "enabled": false,
   "dry_run": true
 }
 ```
@@ -75,14 +75,17 @@ O teto de 100 convites é calculado diretamente em `dispatches`, usando
 `outreach_metrics` é apenas um snapshot para observabilidade e nunca autoriza
 ou bloqueia um envio.
 
-Um dispatch ativo é idempotente por:
+Mensagens e booking ativos são idempotentes por:
 
 ```text
 (lead_id, action, content_hash)
 ```
 
-Os status ativos para essa unicidade são `queued` e `requested`. Registros
-`simulated` não impedem um futuro envio real.
+Os status ativos para essa unicidade são `queued` e `requested`. Convites usam
+uma trava separada e única por `lead_id` enquanto estiverem em `queued`,
+`requested` ou `sent`. Somente cancelar ou marcar o dispatch como `failed`
+permite reconvidar o mesmo lead. Registros `simulated` não impedem um futuro
+envio real.
 
 ## Aplicação local
 
@@ -110,6 +113,8 @@ válida do Supabase, o CRM mostra um erro e não abre uma base local divergente.
 
 - [Status da plataforma](./docs/AGF_PLATFORM_STATUS.md)
 - [Alinhamento de schema da Etapa 0](./docs/ETAPA_0_SCHEMA_ALIGNMENT.md)
+- [Importação legada da Etapa 1](./docs/ETAPA_1_LEGACY_IMPORT.md)
+- [Plano de verificação de fonte da Etapa 2](./docs/ETAPA_2_SOURCE_VERIFICATION_PLAN.md)
 - [Regras das buscas do LinkedIn](./docs/LINKEDIN_SAVED_SEARCHES.md)
 - [Briefing histórico](./docs/AGF_PROJECT_BRIEF.md)
 
@@ -117,8 +122,8 @@ O contrato v1 em `docs/N8N_INTEGRATION_CONTRACT.md` é histórico e obsoleto. O
 contrato vigente é `N8N_INTEGRATION_CONTRACT_v2.md`, fornecido pelo responsável
 do projeto.
 
-## Limite desta entrega
+## Marco atual
 
-Esta entrega executa exclusivamente a Etapa 0: schema, estados, segurança,
-remoção do acoplamento com Sheets e alinhamento da interface. A importação única
-dos leads e o Workflow A ainda não foram implementados.
+A Etapa 0 está aplicada. A Etapa 1 gravou 60 leads em `revisao_manual`, sem
+sinais legados, e o importador foi arquivado. A Etapa 2 está
+apenas planejada e não foi implementada.

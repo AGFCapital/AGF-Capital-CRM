@@ -1,5 +1,5 @@
 -- AGF CRM — espelho de status no Google Sheets.
--- Deve ser aplicada depois de 20260722_002_pipeline_and_sheet_sync.sql.
+-- Deve ser aplicada depois de 20260722000200_pipeline_and_sheet_sync.sql.
 
 create or replace function public.lead_stage_label(stage public.lead_stage)
 returns text

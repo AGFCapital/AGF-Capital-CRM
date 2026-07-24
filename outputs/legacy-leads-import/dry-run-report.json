@@ -1,0 +1,2380 @@
+{
+  "mode": "dry-run",
+  "generatedAt": "2026-07-23T19:22:33.695Z",
+  "totalRead": 60,
+  "importable": 60,
+  "inReviewManual": 60,
+  "duplicatesConsolidated": 0,
+  "aborted": 0,
+  "legacyStatusPreflight": {
+    "expectedValue": "Para aprovação",
+    "safeToApply": true,
+    "distinctValues": [
+      {
+        "value": "Para aprovação",
+        "count": 60
+      }
+    ],
+    "rowsRequiringStop": []
+  },
+  "abortedRows": [],
+  "consolidatedRows": [],
+  "importRecords": [
+    {
+      "company": {
+        "name": "ZAMP",
+        "normalized_name": "zamp",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Felipe Moreira de Souza",
+        "linkedin_url": "https://www.linkedin.com/in/felipemoreira27",
+        "title": "Gerente FP&A | Business Controller | Performance & Analytics",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=5 | legacy_id=\"P1-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "AMAGGI",
+        "normalized_name": "amaggi",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Aline Lima",
+        "linkedin_url": "https://www.linkedin.com/in/aline-lima-8b6ba0b4",
+        "title": "Especialista de FP&A | Finance Engineering",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=6 | legacy_id=\"P1-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "JHSF",
+        "normalized_name": "jhsf",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Ronan De'Lazari",
+        "linkedin_url": "https://www.linkedin.com/in/ronandelazari",
+        "title": "Coordenador de Planejamento Financeiro | Orçamento, Custos e Análise de Riscos",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=7 | legacy_id=\"P1-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "ESTADÃO",
+        "normalized_name": "estadao",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Mariana Perniqueli",
+        "linkedin_url": "https://www.linkedin.com/in/marianaperniqueli",
+        "title": "Estadão — escopo de Planejamento Financeiro a confirmar",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=8 | legacy_id=\"P1-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Longitude Incorporadora",
+        "normalized_name": "longitude incorporadora",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Gonçalo Matarazzo",
+        "linkedin_url": "https://www.linkedin.com/in/gonçalo-matarazzo-8013221b",
+        "title": "Co-fundador e Co-CEO na Longitude Incorporadora",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=9 | legacy_id=\"P1-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Insider Store",
+        "normalized_name": "insider store",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Yuri Gricheno",
+        "linkedin_url": "https://www.linkedin.com/in/yuri-gricheno",
+        "title": "Cofundador e CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=10 | legacy_id=\"P2-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Blau Farmacêutica",
+        "normalized_name": "blau farmaceutica",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Edison Rodrigues",
+        "linkedin_url": "https://www.linkedin.com/in/edisonrodrigues1910",
+        "title": "Gerente de Planejamento Financeiro Sr.; experiência em FP&A, controladoria, valuation, KPIs e OBZ.",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=11 | legacy_id=\"P2-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Plano&Plano",
+        "normalized_name": "plano e plano",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Fabio Jonas",
+        "linkedin_url": "https://www.linkedin.com/in/profilefabiojonas",
+        "title": "Gerente de Gestão de Riscos Corporativos e Controles Internos",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=12 | legacy_id=\"P2-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Livelo",
+        "normalized_name": "livelo",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Flávia Bragheroli de Lima Martinez",
+        "linkedin_url": "https://www.linkedin.com/in/flávia-bragheroli-de-lima-martinez-b8370a49",
+        "title": "Head de Pricing, Revenue & FP&A",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=13 | legacy_id=\"P3-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Unilever Brasil",
+        "normalized_name": "unilever brasil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Lucas Figueira",
+        "linkedin_url": "https://www.linkedin.com/in/lucas-figueira-8226888a",
+        "title": "Home Care LATAM Marketing Finance Business Partner",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=14 | legacy_id=\"P3-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "VR",
+        "normalized_name": "vr",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Adriano Silverio",
+        "linkedin_url": "https://www.linkedin.com/in/adrianosilverio1",
+        "title": "Gerente de FP&A e Pricing de Produtos de Crédito",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=15 | legacy_id=\"P3-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "CHANEL",
+        "normalized_name": "chanel",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Leena Nair",
+        "linkedin_url": "https://www.linkedin.com/in/nairleena",
+        "title": "Global CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=16 | legacy_id=\"P3-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Volkswagen do Brasil",
+        "normalized_name": "volkswagen do brasil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Rafael Teixeira",
+        "linkedin_url": "https://www.linkedin.com/in/rafael-teixeira-v",
+        "title": "Board Member e CFO da América do Sul (SAM)",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=17 | legacy_id=\"P3-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "BairesDev",
+        "normalized_name": "bairesdev",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Nacho De Marco",
+        "linkedin_url": "https://www.linkedin.com/in/idemarco",
+        "title": "Cofundador e CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=18 | legacy_id=\"P3-006\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Cacau Show",
+        "normalized_name": "cacau show",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Danielle (Dany) Pellegrino",
+        "linkedin_url": "https://www.linkedin.com/in/dani-pellegrino",
+        "title": "Financeiro, Controladoria, Processos e Projetos",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=19 | legacy_id=\"P3-007\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Banco BV",
+        "normalized_name": "banco bv",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Rafael Bottyan",
+        "linkedin_url": "https://www.linkedin.com/in/rafael-bottyan-6201b1136",
+        "title": "Analista de FP&A",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=20 | legacy_id=\"P3-008\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "PagBank",
+        "normalized_name": "pagbank",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Plínio Nascimento",
+        "linkedin_url": "https://www.linkedin.com/in/plinionascimentoplanfin",
+        "title": "Planejamento Financeiro",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=21 | legacy_id=\"P3-009\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Kraft Heinz Brasil",
+        "normalized_name": "kraft heinz brasil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Renan Baptista Arantes",
+        "linkedin_url": "https://www.linkedin.com/in/renan-arantes",
+        "title": "FP&A Manager | Cash, Reporting & Credit",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=22 | legacy_id=\"P3-010\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "FIAP",
+        "normalized_name": "fiap",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Juliano Tubino",
+        "linkedin_url": "https://www.linkedin.com/in/juliano-tubino-10b126",
+        "title": "CEO do Grupo Alura (Alura, FIAP e Escola PM3)",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=23 | legacy_id=\"P3-011\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Azzas 2154 / Cia. Hering",
+        "normalized_name": "azzas 2154 cia hering",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Rafael Wanick",
+        "linkedin_url": "https://www.linkedin.com/in/rafael-wanick-79b85027",
+        "title": "Gerente de Planejamento e Projetos",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "vacancy",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": 0,
+        "financial_moment_score": null,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Vagas — leads quentes\" | linha=24 | legacy_id=\"P3-012\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Pinbank Brasil",
+        "normalized_name": "pinbank brasil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Felipe Negri",
+        "linkedin_url": "https://www.linkedin.com/in/felipedomeniconegri",
+        "title": "CEO e sócio",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=5 | legacy_id=\"MM1-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "MedLevensohn",
+        "normalized_name": "medlevensohn",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Arlon Schmidel",
+        "linkedin_url": "https://www.linkedin.com/in/arlon-schmidel-7b5a92114",
+        "title": "Logística e Operações",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=6 | legacy_id=\"MM1-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Grupo MedNet",
+        "normalized_name": "grupo mednet",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Paulo C. Barbudo",
+        "linkedin_url": "https://www.linkedin.com/in/paulo-c-barbudo-bb537724",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=7 | legacy_id=\"MM1-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Buckler",
+        "normalized_name": "buckler",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Bruno Parlato",
+        "linkedin_url": "https://www.linkedin.com/in/brunoparlato",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=8 | legacy_id=\"MM1-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Lavanderia 60 Minutos / Grupo Hi",
+        "normalized_name": "lavanderia 60 minutos grupo hi",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Hairon Silva",
+        "linkedin_url": "https://www.linkedin.com/in/hairon-silva-3b64701b8",
+        "title": "Cofundador, Grupo Hi",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=9 | legacy_id=\"MM1-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "GoodStorage",
+        "normalized_name": "goodstorage",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Thiago Cordeiro",
+        "linkedin_url": "https://www.linkedin.com/in/thicordeiro",
+        "title": "Founder & CEO, GoodStorage",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=10 | legacy_id=\"MM2-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Labotrat Cosméticos",
+        "normalized_name": "labotrat cosmeticos",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Raquel Carvalho",
+        "linkedin_url": "https://www.linkedin.com/in/raquel-carvalho-38b15472",
+        "title": "CEO & fundadora, Labotrat",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=11 | legacy_id=\"MM2-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "GRF Incorporadora",
+        "normalized_name": "grf incorporadora",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Diogo Reis",
+        "linkedin_url": "https://www.linkedin.com/in/diogo-reis-046a12359",
+        "title": "Cofundador, GRF Incorporadora",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=12 | legacy_id=\"MM2-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Ultra Academias",
+        "normalized_name": "ultra academias",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Fernando Nero",
+        "linkedin_url": "https://www.linkedin.com/in/fernando-nero-82663a72",
+        "title": "Fundador, Ultra Academias",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=13 | legacy_id=\"MM2-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "La Guapa",
+        "normalized_name": "la guapa",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Benny Goldenberg",
+        "linkedin_url": "https://www.linkedin.com/in/benny-goldenberg-2ab72616",
+        "title": "CEO & cofundador, La Guapa",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=14 | legacy_id=\"MM2-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Skyone",
+        "normalized_name": "skyone",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Ricardo Brandão",
+        "linkedin_url": "https://www.linkedin.com/in/ricardobrandao-skyone",
+        "title": "CEO & cofundador, Skyone",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=15 | legacy_id=\"MM2-006\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "MXM Sistemas",
+        "normalized_name": "mxm sistemas",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Guilherme Carrullo",
+        "linkedin_url": "https://www.linkedin.com/in/guilhermecarrullo",
+        "title": "CEO, MXM Sistemas",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=16 | legacy_id=\"MM2-007\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Tripla",
+        "normalized_name": "tripla",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Rodrigo Colen",
+        "linkedin_url": "https://www.linkedin.com/in/colen-tripla",
+        "title": "CEO & fundador, Tripla",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=17 | legacy_id=\"MM2-008\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "BHS",
+        "normalized_name": "bhs",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "André Xavier",
+        "linkedin_url": "https://www.linkedin.com/in/axavier",
+        "title": "CEO, BHS",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=18 | legacy_id=\"MM2-009\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Escale",
+        "normalized_name": "escale",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Ken Diamond",
+        "linkedin_url": "https://www.linkedin.com/in/kendiamond02",
+        "title": "Fundador & CEO, Escale",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=19 | legacy_id=\"MM2-010\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Di Paolo",
+        "normalized_name": "di paolo",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Dionathan Luiz Fydryzewski",
+        "linkedin_url": "https://www.linkedin.com/in/dionathanfydryzewski",
+        "title": "Executivo Comercial Di Paolo | Eventos | Founder Dion Rocken",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=20 | legacy_id=\"MM3-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Solarprime",
+        "normalized_name": "solarprime",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Raphael Brito",
+        "linkedin_url": "https://www.linkedin.com/in/raphaelbrito-solarprime",
+        "title": "Fundador e Diretor Executivo",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=21 | legacy_id=\"MM3-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Lider Interiores",
+        "normalized_name": "lider interiores",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Tiago Nogueira",
+        "linkedin_url": "https://www.linkedin.com/in/tiago-nogueira-46831068",
+        "title": "Diretor Comercial e de Marketing",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=22 | legacy_id=\"MM3-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "US Media",
+        "normalized_name": "us media",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Nathália Maciel Guimarães",
+        "linkedin_url": "https://www.linkedin.com/in/nmguimaraess",
+        "title": "CSM Leader / Relationship Manager — Brazil & LATAM",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=23 | legacy_id=\"MM3-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Lobits (Milho de Ouro)",
+        "normalized_name": "lobits milho de ouro",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Pedro Rodrigues",
+        "linkedin_url": "https://www.linkedin.com/in/pedro-rodrigues-1097512a/en",
+        "title": "Diretor Comercial e integrante da família fundadora",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=24 | legacy_id=\"MM3-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "HCC Hotels",
+        "normalized_name": "hcc hotels",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Elias Rodrigues",
+        "linkedin_url": "https://www.linkedin.com/in/elias-rodrigues-a1211b23",
+        "title": "Diretor-Presidente (CEO)",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=25 | legacy_id=\"MM3-006\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Bioclin",
+        "normalized_name": "bioclin",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Victor Arndt Junior",
+        "linkedin_url": "https://www.linkedin.com/in/victor-arndt-junior",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=26 | legacy_id=\"MM3-007\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Panfácil",
+        "normalized_name": "panfacil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Cassiano Carvalho",
+        "linkedin_url": "https://www.linkedin.com/in/cassiano-carvalho-482a9048",
+        "title": "Gerente de Vendas",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=27 | legacy_id=\"MM3-008\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Retail Mind Group",
+        "normalized_name": "retail mind group",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Vitor Hugo Rocha",
+        "linkedin_url": "https://www.linkedin.com/in/vitorhugorocha",
+        "title": "CEO global",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=28 | legacy_id=\"MM3-009\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Suporte Infra",
+        "normalized_name": "suporte infra",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Maurício Malanconi",
+        "linkedin_url": "https://www.linkedin.com/in/mauricio-malanconi-852b5237",
+        "title": "Fundador e CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=29 | legacy_id=\"MM3-010\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Cubbo",
+        "normalized_name": "cubbo",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Josu Gurtubay",
+        "linkedin_url": "https://www.linkedin.com/in/gurtubay",
+        "title": "Cofundador e COO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=30 | legacy_id=\"MM3-011\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Grupo Fakini",
+        "normalized_name": "grupo fakini",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Francis G. Fachini",
+        "linkedin_url": "https://www.linkedin.com/in/francis-g-fachini-040620106",
+        "title": "CEO e Diretor",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=31 | legacy_id=\"MM3-012\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Certisign",
+        "normalized_name": "certisign",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Marco Americo D. Antonio",
+        "linkedin_url": "https://www.linkedin.com/in/marcoamerico",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=32 | legacy_id=\"MM3-013\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Maxinutri",
+        "normalized_name": "maxinutri",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Kal Rodrigues",
+        "linkedin_url": "https://www.linkedin.com/in/kal-rodrigues-8774273b",
+        "title": "Diretor Comercial",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=33 | legacy_id=\"MM3-014\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Maná do Brasil",
+        "normalized_name": "mana do brasil",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Silvia Maria Coleraus",
+        "linkedin_url": "https://www.linkedin.com/in/silvia-maria-coleraus-7459632a",
+        "title": "Diretora Comercial e sócia",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=34 | legacy_id=\"MM3-015\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Indústria Fox",
+        "normalized_name": "industria fox",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Marcelo Souza",
+        "linkedin_url": "https://www.linkedin.com/in/-marcelo-souza-",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=35 | legacy_id=\"MM4-001\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Sorvetes Frosty",
+        "normalized_name": "sorvetes frosty",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Edgard Filipe Segantini",
+        "linkedin_url": "https://www.linkedin.com/in/edgard-filipe-segantini",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=36 | legacy_id=\"MM4-002\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "3E Soluções",
+        "normalized_name": "3e solucoes",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Maurício Milhomem Gonçalves",
+        "linkedin_url": "https://www.linkedin.com/in/maurício-milhomem-gonçalves",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=37 | legacy_id=\"MM4-003\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Fast Tennis",
+        "normalized_name": "fast tennis",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Lucas André",
+        "linkedin_url": "https://www.linkedin.com/in/lucasandreribeiro",
+        "title": "Fundador e CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=38 | legacy_id=\"MM4-004\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Turbi",
+        "normalized_name": "turbi",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Mario Liao",
+        "linkedin_url": "https://www.linkedin.com/in/mario-liao",
+        "title": "CFO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=39 | legacy_id=\"MM4-005\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "MBOOM",
+        "normalized_name": "mboom",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Flavia Montebeller",
+        "linkedin_url": "https://www.linkedin.com/in/flavia-montebeller-2a146386",
+        "title": "CEO e fundadora",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=40 | legacy_id=\"MM4-006\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Shippify",
+        "normalized_name": "shippify",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Janaina Araujo de Souza",
+        "linkedin_url": "https://www.linkedin.com/in/janaina-araujo-de-souza-837a6734",
+        "title": "CFO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=41 | legacy_id=\"MM4-007\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Ballena",
+        "normalized_name": "ballena",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Fernando Gorayeb",
+        "linkedin_url": "https://www.linkedin.com/in/fernandocgb",
+        "title": "Cofundador e CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=42 | legacy_id=\"MM4-008\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Zait Engenharia",
+        "normalized_name": "zait engenharia",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Henrique Martins de Oliveira",
+        "linkedin_url": "https://www.linkedin.com/in/henrique-martins-de-oliveira-5b0b06129",
+        "title": "Sócio diretor",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=43 | legacy_id=\"MM4-009\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    },
+    {
+      "company": {
+        "name": "Vulp Air",
+        "normalized_name": "vulp air",
+        "industry": null,
+        "headquarters_city": null,
+        "headquarters_state": null,
+        "employee_count": null,
+        "company_size": null,
+        "revenue_proxy_min": null,
+        "revenue_proxy_max": null,
+        "real_economy": false,
+        "real_economy_rationale": null
+      },
+      "contact": {
+        "full_name": "Mateus Orsini",
+        "linkedin_url": "https://www.linkedin.com/in/mateusorsini",
+        "title": "CEO",
+        "location_country": null,
+        "connection_count": null,
+        "connect_available": false,
+        "profile_gate_passed": false,
+        "profile_gate_reason": "Importação legada: perfil não revalidado.",
+        "career_context": null
+      },
+      "lead": {
+        "source": "middle_market",
+        "current_stage": "revisao_manual",
+        "company_size_score": 0,
+        "urgency_score": null,
+        "financial_moment_score": 0,
+        "decision_maker_score": 0,
+        "real_economy_bonus": 0,
+        "company_overview": null,
+        "contact_context": null,
+        "import_origin": "Google Sheets | aba=\"Middle market — prospecção proativa\" | linha=44 | legacy_id=\"MM4-010\" | status_crm_legado=\"\" | status_legado=\"Para aprovação\""
+      },
+      "lead_signals": []
+    }
+  ],
+  "invariants": {
+    "targetStage": "revisao_manual",
+    "sourceStatusControlsStage": false,
+    "legacyStatusesPreservedInImportOrigin": true,
+    "leadSignalsCreated": 0,
+    "verifiedAtFabricated": false,
+    "verificationMethodFabricated": false,
+    "sourceTabs": [
+      "Vagas — leads quentes",
+      "Middle market — prospecção proativa"
+    ],
+    "excludedTabs": [
+      "M&A - Pré-captação",
+      "Critérios e filtros"
+    ]
+  }
+}

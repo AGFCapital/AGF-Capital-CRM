@@ -253,7 +253,12 @@ set channel = case
   else 'manual'
 end,
 content_hash = encode(
-  digest(coalesce(payload::text, '') || ':' || action::text, 'sha256'),
+  sha256(
+    convert_to(
+      coalesce(payload::text, '') || ':' || action::text,
+      'UTF8'
+    )
+  ),
   'hex'
 );
 
@@ -264,12 +269,28 @@ alter table public.dispatches
   add constraint dispatches_content_hash_check
     check (content_hash ~ '^[0-9a-f]{64}$');
 
-create unique index dispatches_one_active_content_idx
+create unique index dispatches_manual_content_active_idx
   on public.dispatches (lead_id, action, content_hash)
-  where status in (
+  where action in (
+      'linkedin_message'::public.dispatch_action,
+      'booking_link'::public.dispatch_action
+    )
+    and status in (
     'queued'::public.dispatch_status,
     'requested'::public.dispatch_status
   );
+
+create unique index dispatches_one_connection_invite_idx
+  on public.dispatches (lead_id)
+  where action = 'connection_invite'::public.dispatch_action
+    and status in (
+      'queued'::public.dispatch_status,
+      'requested'::public.dispatch_status,
+      'sent'::public.dispatch_status
+    );
+
+comment on index public.dispatches_one_connection_invite_idx is
+  'Um lead só pode receber novo convite se o dispatch anterior tiver status failed ou cancelled.';
 
 create index dispatches_connection_invites_sent_at_idx
   on public.dispatches (sent_at desc)
@@ -331,8 +352,15 @@ returns trigger
 language plpgsql
 as $$
 begin
-  if old.approved_at is not null and new.body is distinct from old.body then
-    raise exception 'O corpo de um template aprovado é imutável. Crie uma nova linha inativa para editar.';
+  if old.approved_at is not null then
+    if new.approved_at is null then
+      raise exception 'A aprovação de um template não pode ser removida.';
+    end if;
+
+    if new.body is distinct from old.body
+       or new.variables is distinct from old.variables then
+      raise exception 'Corpo e variáveis de um template aprovado são imutáveis. Crie uma nova linha inativa para editar.';
+    end if;
   end if;
 
   return new;
@@ -435,12 +463,45 @@ create policy "authenticated users read outreach metrics"
   for select to authenticated
   using (true);
 
+-- RLS das tabelas operacionais sensíveis. Todos os usuários autenticados
+-- mantêm leitura; somente escritas explicitamente autorizadas ficam no client.
+drop policy if exists "authenticated users manage settings"
+  on public.app_settings;
+
+create policy "authenticated users read settings"
+  on public.app_settings
+  for select to authenticated
+  using (true);
+
+create policy "authenticated users update non-outreach settings"
+  on public.app_settings
+  for update to authenticated
+  using (setting_key <> 'outreach')
+  with check (setting_key <> 'outreach');
+
+drop policy if exists "authenticated users manage dispatches"
+  on public.dispatches;
+
+create policy "authenticated users read dispatches"
+  on public.dispatches
+  for select to authenticated
+  using (true);
+
+create policy "authenticated users record manual linkedin messages"
+  on public.dispatches
+  for insert to authenticated
+  with check (
+    action = 'linkedin_message'::public.dispatch_action
+    and channel = 'manual'
+    and status = 'sent'::public.dispatch_status
+  );
+
 -- Configuração de segurança: todo piloto começa em dry-run.
 insert into public.app_settings (setting_key, description, value)
 values (
   'outreach',
   'Controle do convite automático. dry_run permanece ativo até autorização escrita.',
-  '{"enabled":true,"dry_run":true}'::jsonb
+  '{"enabled":false,"dry_run":true}'::jsonb
 )
 on conflict (setting_key) do update
 set value = jsonb_set(
@@ -449,7 +510,7 @@ set value = jsonb_set(
         '{enabled}',
         coalesce(
           nullif(public.app_settings.value -> 'enabled', 'null'::jsonb),
-          'true'::jsonb
+          'false'::jsonb
         ),
         true
       ),
