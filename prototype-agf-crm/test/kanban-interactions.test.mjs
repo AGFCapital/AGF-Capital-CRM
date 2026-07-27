@@ -32,5 +32,11 @@ assert.match(source, /function notifyDueFollowUps\(/,
   "Follow-ups vencidos ou proximos devem gerar alerta no CRM.");
 assert.match(source, /scheduleFollowUpNotifications\(\)/,
   "A verificacao de follow-ups deve continuar ativa durante a sessao.");
+assert.match(source, /function prepareApolloImport\(/,
+  "O CRM deve preparar um CSV do Apollo antes de gravar no Supabase.");
+assert.match(source, /current_stage: "revisao_manual"/,
+  "Leads importados do Apollo devem entrar na Base de clientes em revisão manual.");
+assert.match(source, /profile_gate_passed: false/,
+  "O importador não pode declarar conexões do LinkedIn como verificadas sem evidência.");
 
 console.log("kanban interaction contract: ok");
