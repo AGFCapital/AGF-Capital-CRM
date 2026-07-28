@@ -5,9 +5,10 @@ fonte de verdade dos cards, follow-ups, agenda e projetos.
 
 ## Escopo atual
 
-A descoberta e a extracao de leads estao deliberadamente desacopladas do CRM.
-Apollo, planilha, PhantomBuster ou outro processo poderao alimentar a base no
-futuro, mas nenhum deles faz parte da aplicacao nesta fase.
+A descoberta e a filtragem de leads continuam desacopladas do CRM. A entrada
+temporaria definida e um CSV ja filtrado, normalmente exportado do Apollo. Uma
+lista longa e carregada uma unica vez em um banco de espera no Supabase; o
+operador escolhe quantos leads serao liberados gradualmente para o Kanban.
 
 O CRM opera os leads que ja existem na base:
 
@@ -44,6 +45,8 @@ LinkedIn e registra o resultado no card.
 - agenda de calls confirmadas;
 - pipeline comercial independente, inclusive para projetos criados sem lead;
 - configuracao do link publico da agenda.
+- banco de leads para listas longas, com importacao em lote, deduplicacao
+  global e liberacao configuravel de 1 a 100 cards por vez.
 
 ## Banco e migration atual
 
@@ -57,6 +60,16 @@ Ela cria:
 - `lead_follow_ups`;
 - `commercial_projects`;
 - a configuracao `app_settings.calendar_booking`.
+
+As migrations `20260728000100_long_list_lead_pool.sql` e
+`20260728000200_lead_pool_dashboard_totals.sql` adicionam:
+
+- lotes de importacao (`lead_import_batches`);
+- banco de espera (`lead_pool`);
+- RPC unica para importar ate 5.000 linhas;
+- RPC atomica para liberar os proximos N leads;
+- deduplicacao por empresa, contato, LinkedIn e IDs do Apollo;
+- configuracao persistente da quantidade padrao.
 
 Execute as migrations pelo Supabase CLI antes de usar esses recursos em uma
 base remota:

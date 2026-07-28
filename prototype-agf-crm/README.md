@@ -21,14 +21,15 @@ chave publicavel do Supabase. Nunca use `service_role` neste arquivo.
 - registra follow-ups e projetos comerciais;
 - exibe chamadas devolvidas pelo Google Calendar/n8n;
 - permite configurar o link publico da agenda.
+- importa listas CSV ja filtradas para um banco de espera;
+- libera gradualmente uma quantidade configuravel de leads para o Kanban.
 
 ## O que ela nao faz
 
-- nao extrai leads;
+- nao descobre nem filtra leads;
 - nao chama Apollo, PhantomBuster, Gemini, LinkedIn ou planilhas;
 - nao envia convite nem mensagem automaticamente;
 - nao contem credencial do n8n.
 
-A migration `../supabase/migrations/20260724000100_manual_crm_operations.sql`
-precisa estar aplicada para os recursos de follow-up, projetos e configuracao
-de agenda funcionarem no banco remoto.
+As migrations de operacao manual e banco de leads em `../supabase/migrations/`
+precisam estar aplicadas no banco remoto.

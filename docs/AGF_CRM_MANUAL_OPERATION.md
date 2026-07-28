@@ -2,10 +2,32 @@
 
 ## Limite de escopo
 
-O CRM nao descobre, extrai, qualifica ou envia leads automaticamente. Ele
-recebe e opera cards que ja existam no Supabase. A futura entrada pode ser
-Apollo, CSV/XLSX, Google Sheets, PhantomBuster ou outro processo, sem mudar as
-regras desta operacao.
+O CRM nao descobre, qualifica ou envia leads automaticamente. Ele recebe uma
+lista ja filtrada, atualmente em CSV, e a guarda no Supabase sem criar todos
+os cards de uma vez. A origem futura pode mudar sem alterar as regras da
+operacao comercial.
+
+## Banco de leads
+
+Uma lista longa e importada uma unica vez para `lead_pool`. A importacao:
+
+- aceita ate 5.000 linhas por lote;
+- nao cria cards automaticamente;
+- remove duplicidades internas do CSV;
+- confere todo o historico do CRM e todos os lotes anteriores;
+- usa empresa, contato, URL normalizada do LinkedIn e IDs do Apollo no dedupe;
+- detecta CSV em UTF-8 ou Windows-1252, repara mojibake como `JoÃ£o` e
+  padroniza acentos Unicode antes de comparar ou armazenar nomes;
+- nao armazena e-mail, telefone ou tecnologias do export.
+
+No painel **Banco de leads**, o operador escolhe entre 1 e 100 registros e
+clica em **Liberar leads**. A quantidade fica salva como novo padrao. A RPC
+reserva os registros com lock, cria empresa, contato e lead na mesma transacao
+e envia o card para `revisao_manual`, exibido como **Base de clientes**.
+
+Importar 1.000 linhas nao produz 1.000 cards nem milhares de requisicoes no
+browser: o upload e uma unica chamada e cada liberacao tambem e uma unica
+operacao atomica.
 
 ## Fluxo do lead
 

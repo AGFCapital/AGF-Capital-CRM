@@ -1,0 +1,186 @@
+{
+  "name": "AGF | Google Calendar -> Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "calendar": {
+          "__rl": true,
+          "value": "caio@agfcapital.com.br",
+          "mode": "list",
+          "cachedResultName": "caio@agfcapital.com.br"
+        },
+        "triggerOn": "eventCreated",
+        "options": {}
+      },
+      "id": "2787d868-c07e-418f-959c-db774cc1cc6c",
+      "name": "Reserva criada no Calendar",
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -96
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "calendar": {
+          "__rl": true,
+          "value": "caio@agfcapital.com.br",
+          "mode": "list",
+          "cachedResultName": "caio@agfcapital.com.br"
+        },
+        "triggerOn": "eventUpdated",
+        "options": {}
+      },
+      "id": "48601d2d-a188-47e4-90f1-b363db52c0b6",
+      "name": "Reserva atualizada no Calendar",
+      "type": "n8n-nodes-base.googleCalendarTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agf-calendar-booking-test",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "a998004b-09dd-4bc7-a06f-402d8bdc90df",
+      "name": "Webhook somente para teste",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        272
+      ],
+      "webhookId": "9f4ca5f8-37fa-440e-9ae7-f823b946edcc"
+    },
+    {
+      "parameters": {
+        "jsCode": "const incoming = $input.first().json;\nconst event = incoming.body ?? incoming;\nif (incoming.headers) {\n  const expectedSecret = $vars.AGF_CALENDAR_WEBHOOK_SECRET;\n  const receivedSecret = incoming.headers['x-agf-webhook-secret'] || incoming.headers['X-AGF-Webhook-Secret'];\n  if (!expectedSecret || receivedSecret !== expectedSecret) throw new Error('Webhook de teste do Calendar não autorizado.');\n}\nconst summary = event.summary ?? event.event_title ?? '';\nconst description = event.description ?? '';\nconst startsAt = event.start?.dateTime ?? event.starts_at;\nconst endsAt = event.end?.dateTime ?? event.ends_at;\nif (!event.id && !event.provider_event_id) throw new Error('Evento sem identificador.');\nif (!startsAt && String(event.status ?? '').toLowerCase() !== 'cancelled') return [];\nconst attendeeList = Array.isArray(event.attendees) ? event.attendees : [];\nconst guests = attendeeList.filter((attendee) => !attendee.organizer && !attendee.self);\nconst mainGuest = guests[0] ?? {};\nconst companyMatch = description.match(/(?:^|\\n)\\s*(?:Empresa|Company)\\s*:\\s*([^\\n]+)/i);\nconst guestName = event.guest_name ?? mainGuest.displayName ?? (summary.replace(/^.*?\\bwith\\s+/i, '').trim() || null);\nconst meetingUrl = event.hangoutLink ?? event.conferenceData?.entryPoints?.find((item) => item.entryPointType === 'video')?.uri ?? event.meeting_url ?? null;\nreturn [{ json: { payload: {\n  provider_event_id: event.id ?? event.provider_event_id,\n  status: event.status ?? 'confirmed',\n  event_title: summary,\n  starts_at: startsAt ?? null,\n  ends_at: endsAt ?? null,\n  meeting_url: meetingUrl,\n  booking_link: event.htmlLink ?? event.booking_link ?? null,\n  guest_email: event.guest_email ?? mainGuest.email ?? null,\n  guest_name: guestName,\n  company_answer: event.company_answer ?? companyMatch?.[1]?.trim() ?? null,\n  additional_participant_mentioned: guests.length > 1,\n  additional_participant_note: guests.length > 1 ? guests.slice(1).map((guest) => guest.displayName || guest.email).filter(Boolean).join(', ') : null,\n  raw_event: event\n}} }];"
+      },
+      "id": "f3017ea3-ee3c-465f-943d-3c35c64083bf",
+      "name": "Normalizar reserva",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yyhstftoxecrtxqcydew.supabase.co/rest/v1/rpc/sync_google_calendar_booking",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ p_payload: $json.payload }) }}",
+        "options": {}
+      },
+      "id": "24b528a8-299e-4350-bdc0-af45b81b85c5",
+      "name": "Sincronizar reserva no Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Reserva criada no Calendar": {
+      "main": [
+        [
+          {
+            "node": "Normalizar reserva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reserva atualizada no Calendar": {
+      "main": [
+        [
+          {
+            "node": "Normalizar reserva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook somente para teste": {
+      "main": [
+        [
+          {
+            "node": "Normalizar reserva",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar reserva": {
+      "main": [
+        [
+          {
+            "node": "Sincronizar reserva no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "tags": []
+}

@@ -1,0 +1,2 @@
+-- Esta migration apenas substitui funções. O rollback seguro é reaplicar as
+-- versões presentes em 20260728000100_long_list_lead_pool.sql.

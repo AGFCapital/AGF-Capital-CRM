@@ -1,0 +1,107 @@
+{
+  "name": "AGF | Apollo -> Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agf-apollo-leads",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "4b038823-8f28-46cf-af11-6f573751c3a0",
+      "name": "Receber leads Apollo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "46d1b188-083e-45cd-a9d8-584175cbca55"
+    },
+    {
+      "parameters": {
+        "jsCode": "const request = $input.first().json;\nconst expectedSecret = $vars.AGF_APOLLO_WEBHOOK_SECRET;\nconst receivedSecret = request.headers?.['x-agf-webhook-secret'] || request.headers?.['X-AGF-Webhook-Secret'];\nif (!expectedSecret || receivedSecret !== expectedSecret) throw new Error('Webhook Apollo não autorizado.');\nconst body = request.body ?? request;\nconst records = Array.isArray(body.records) ? body.records : [body.record ?? body];\nif (!records.length) throw new Error('Nenhum lead recebido.');\nreturn records.map((record, index) => {\n  const company = record.company ?? {};\n  const contact = record.contact ?? {};\n  const companyName = company.name ?? record['Company Name'] ?? record.company_name;\n  const fullName = contact.full_name ?? record.full_name ?? [record['First Name'], record['Last Name']].filter(Boolean).join(' ');\n  const linkedinUrl = contact.linkedin_url ?? record['Person Linkedin Url'] ?? record.linkedin_url;\n  const apolloContactId = contact.apollo_contact_id ?? record['Apollo Contact Id'] ?? record.apollo_contact_id;\n  const apolloAccountId = company.apollo_account_id ?? record['Apollo Account Id'] ?? record.apollo_account_id;\n  const eventId = record.event_id ?? [apolloContactId || linkedinUrl, record.updated_at || body.sync_id || 'snapshot', index].join(':');\n  return { json: {\n    external_event_id: String(eventId),\n    payload: {\n      company: {\n        name: companyName,\n        apollo_account_id: apolloAccountId || null,\n        linkedin_url: company.linkedin_url ?? record['Company Linkedin Url'] ?? null,\n        website_domain: company.website_domain ?? record.website_domain ?? record.Website ?? null,\n        industry: company.industry ?? record.Industry ?? null,\n        city: company.city ?? record['Company City'] ?? record.City ?? null,\n        state: company.state ?? record['Company State'] ?? record.State ?? null,\n        employee_count: company.employee_count ?? record['# Employees'] ?? null,\n        company_size: company.company_size ?? null,\n        annual_revenue: company.annual_revenue ?? record['Annual Revenue'] ?? null,\n        real_economy: company.real_economy ?? false\n      },\n      contact: {\n        full_name: fullName,\n        apollo_contact_id: apolloContactId || null,\n        linkedin_url: linkedinUrl,\n        title: contact.title ?? record.Title ?? null,\n        email: contact.email ?? record.Email ?? null,\n        country: contact.country ?? record.Country ?? record['Person Country'] ?? 'Brasil'\n      },\n      raw: record\n    }\n  }};\n});"
+      },
+      "id": "8c8a4086-e30a-4bc0-b12d-26813563372e",
+      "name": "Validar e normalizar lote",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yyhstftoxecrtxqcydew.supabase.co/rest/v1/rpc/ingest_apollo_lead",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ p_payload: $json.payload, p_external_event_id: $json.external_event_id }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 10,
+              "batchInterval": 500
+            }
+          }
+        }
+      },
+      "id": "abca9510-d9b1-4811-9f20-cfa1c58ca547",
+      "name": "Upsert atômico no Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        496,
+        0
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Receber leads Apollo": {
+      "main": [
+        [
+          {
+            "node": "Validar e normalizar lote",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validar e normalizar lote": {
+      "main": [
+        [
+          {
+            "node": "Upsert atômico no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "tags": []
+}
