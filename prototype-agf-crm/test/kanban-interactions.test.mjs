@@ -10,6 +10,7 @@ const source = fs.readFileSync(path.join(here, "..", "crm.js"), "utf8");
 const importerSource = fs.readFileSync(path.join(here, "..", "apollo-import.js"), "utf8");
 const poolMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000100_long_list_lead_pool.sql"), "utf8");
 const bookingLifecycleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000300_calendar_booking_lifecycle.sql"), "utf8");
+const followUpOwnershipMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260729000400_follow_up_ownership_and_manual_operations.sql"), "utf8");
 
 assert.match(source, /const stageDropTargets = \{/,
   "Cada coluna operacional deve declarar a etapa que conclui ao receber um card.");
@@ -83,16 +84,38 @@ assert.match(source, /function notifyDueFollowUps\(/,
   "Follow-ups vencidos ou proximos devem gerar alerta no CRM.");
 assert.match(source, /scheduleFollowUpNotifications\(\)/,
   "A verificacao de follow-ups deve continuar ativa durante a sessao.");
+assert.match(source, /assigned_to:\s*state\.remote\.session\.user\.id/,
+  "Todo novo follow-up deve pertencer ao usuario que o criou.");
+assert.match(source, /data-notification-view="mine"/,
+  "O sino deve abrir com uma visualizacao individual.");
+assert.match(source, /data-notification-view="team"/,
+  "A fila compartilhada deve continuar acessivel no sino.");
+assert.match(source, /function canMoveLead\(/,
+  "O Kanban deve permitir movimentos de retorno sem liberar saltos para frente.");
+assert.match(source, /data-action="new-manual-lead"/,
+  "A Base de clientes deve permitir cadastro manual.");
+assert.match(source, /\/rest\/v1\/rpc\/create_manual_lead/,
+  "O cadastro manual deve ser atomico no banco.");
+assert.match(source, /data-action="delete-project"/,
+  "O painel de projeto deve permitir exclusao protegida.");
+assert.match(source, /\/rest\/v1\/rpc\/delete_commercial_project/,
+  "Excluir projeto deve restaurar atomicamente o lead vinculado.");
+assert.match(source, /projectValueByStage\(state\.projects, projectStages\)/,
+  "O dashboard deve agregar valor real por etapa do pipeline.");
+assert.match(followUpOwnershipMigrationSource, /follow_up_email_deliveries/,
+  "O banco deve manter uma fila idempotente de notificacoes por e-mail.");
+assert.match(followUpOwnershipMigrationSource, /follow_up_email_enabled/,
+  "Cada perfil deve controlar sua propria preferencia de e-mail.");
 assert.match(source, /import \{ decodeApolloCsv, prepareApolloImport \} from "\.\/apollo-import\.js"/,
   "O CRM deve usar o módulo de importação do Apollo antes de gravar no Supabase.");
 assert.match(source, /decodeApolloCsv\(await file\.arrayBuffer\(\)\)/,
   "O CRM deve detectar a codificação do arquivo antes de interpretar nomes com acentos.");
 assert.match(importerSource, /export function prepareApolloImport\(/,
   "O módulo de importação deve concentrar o mapeamento e a validação do CSV.");
-assert.match(source, /\/rest\/v1\/rpc\/import_lead_pool/,
-  "Uma lista longa deve entrar no banco de espera por uma única operação atômica.");
-assert.match(source, /\/rest\/v1\/rpc\/release_lead_pool/,
-  "A interface deve liberar apenas a quantidade configurada para o Kanban.");
+assert.match(source, /\/rest\/v1\/rpc\/import_named_lead_pool/,
+  "Uma lista longa nomeada deve entrar no banco de espera por uma única operação atômica.");
+assert.match(source, /\/rest\/v1\/rpc\/release_lead_pool_batch/,
+  "A interface deve liberar apenas a quantidade configurada da base escolhida.");
 assert.doesNotMatch(source, /for \(const record of report\.records\)/,
   "A interface não deve voltar a fazer várias chamadas ao Supabase por lead.");
 assert.match(poolMigrationSource, /'revisao_manual'/,
