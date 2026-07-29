@@ -1,110 +1,129 @@
-# Operacao manual do CRM AGF
+# Operação manual do CRM AGF
 
-## Limite de escopo
+Atualizado em 29 de julho de 2026.
 
-O CRM nao descobre, qualifica ou envia leads automaticamente. Ele recebe uma
-lista ja filtrada, atualmente em CSV, e a guarda no Supabase sem criar todos
-os cards de uma vez. A origem futura pode mudar sem alterar as regras da
-operacao comercial.
+## 1. Entrar e localizar um lead
 
-## Banco de leads
+Todos os operadores acessam a mesma base. Use a busca no topo para localizar
+empresa, contato, cargo ou LinkedIn. O sino mostra primeiro as tarefas do
+usuário atual e permite alternar para a equipe.
 
-Uma lista longa e importada uma unica vez para `lead_pool`. A importacao:
+## 2. Importar uma base
 
-- aceita ate 5.000 linhas por lote;
-- nao cria cards automaticamente;
-- remove duplicidades internas do CSV;
-- confere todo o historico do CRM e todos os lotes anteriores;
-- usa empresa, contato, URL normalizada do LinkedIn e IDs do Apollo no dedupe;
-- detecta CSV em UTF-8 ou Windows-1252, repara mojibake como `JoÃ£o` e
-  padroniza acentos Unicode antes de comparar ou armazenar nomes;
-- nao armazena e-mail, telefone ou tecnologias do export.
+1. Abra **Banco de leads**.
+2. Preencha **Nome da nova base**.
+3. Selecione o CSV Apollo já filtrado.
+4. Aguarde o relatório de válidos, inválidos e duplicados.
 
-No painel **Banco de leads**, o operador escolhe entre 1 e 100 registros e
-clica em **Liberar leads**. A quantidade fica salva como novo padrao. A RPC
-reserva os registros com lock, cria empresa, contato e lead na mesma transacao
-e envia o card para `revisao_manual`, exibido como **Base de clientes**.
+O upload não cria cards. A lista fica no banco de espera.
 
-Importar 1.000 linhas nao produz 1.000 cards nem milhares de requisicoes no
-browser: o upload e uma unica chamada e cada liberacao tambem e uma unica
-operacao atomica.
+Regras:
 
-## Fluxo do lead
+- até 5.000 linhas por arquivo;
+- empresa, contato e LinkedIn são obrigatórios;
+- duplicatas internas são descartadas;
+- duplicatas contra qualquer base ou histórico são bloqueadas;
+- acentos e codificações comuns são normalizados;
+- cada arquivo é uma base independente, mas a deduplicação é global.
 
-| Etapa exibida | Estado no banco | Acao do operador |
-|---|---|---|
-| Base de clientes | `revisao_manual` ou `qualificado` | Decide se o lead deve entrar na fila de convite. |
-| Enviar convite | `aprovado` | Abre o LinkedIn, copia a nota, envia o convite e clica em **Enviei o convite**. |
-| Convite pendente | `convite_enviado` | Aguarda; ao ver o aceite, clica em **Confirmar aceite**. |
-| Conexao aceita | `conexao_aceita` | Edita/copia a mensagem longa, envia no LinkedIn e registra o envio. |
-| Mensagem enviada | `mensagem_enviada` | Ao receber resposta, registra **Recebi uma resposta**. |
-| Em conversa | `em_conversa` | Conduz a conversa e move para agendamento quando houver abertura. |
-| Agendamento | `agendamento` | Copia e envia manualmente o link da agenda. |
-| Call marcada | `call_marcada` | Vem do Calendar/n8n; mostra horario no card. |
-| Criar projeto | transicao para `concluido` | Ao arrastar uma call com interesse para esta coluna, cria um projeto em `Pos-call` e abre a aba Projetos. |
-| Descartado | `descartado` | Lead sem continuidade ou fora do foco. |
+## 3. Liberar leads
 
-Os estados historicos `concluido` e `convite_expirado` permanecem preservados
-no banco e aparecem no Historico, mas nao sao mais etapas operacionais do
-Kanban. Um lead com interesse segue para **Projetos**; um lead sem interesse ou
-fit segue para **Descartado**. A coluna **Criar projeto** e uma transicao: o
-card nao permanece nela; ele e transformado em um projeto do pipeline.
+No mesmo painel:
 
-O Kanban so aceita arrastar o card para a proxima etapa permitida. As acoes que
-dependem de uma atividade humana no LinkedIn permanecem em botoes explicitos,
-para gravar data e historico corretamente.
+1. escolha a base;
+2. informe de 1 a 100;
+3. clique em **Liberar leads**.
 
-## Nota de convite e texto de agendamento
+Somente registros daquela base viram cards na Base de clientes. Liberações
+simultâneas usam lock no banco para não duplicar registros.
 
-Na etapa **Enviar convite**, o botão **Copiar nota** usa:
+## 4. Operar o Kanban
+
+| Etapa | Ação |
+|---|---|
+| Base de clientes | Revisar e mover para Enviar convite. |
+| Enviar convite | Copiar nota, abrir LinkedIn e enviar manualmente. |
+| Convite pendente | Aguardar e confirmar o aceite manualmente. |
+| Conexão aceita | Revisar/copiar a mensagem longa e enviar. |
+| Mensagem enviada | Marcar quando houver resposta. |
+| Em conversa | Conduzir a conversa. |
+| Agendamento | Copiar o texto com o link da agenda. |
+| Call marcada | Conferir horário e Meet; copiar agradecimento. |
+| Criar projeto | Transformar o lead em projeto `Pos-call`. |
+| Descartado | Encerrar a prospecção. |
+
+Arrastar para a próxima etapa confirma a ação. O card também pode voltar para
+etapas anteriores. Um projeto criado deixa o Kanban de leads e aparece no
+pipeline comercial.
+
+## 5. Card expandido
+
+Use o detalhe para:
+
+- editar mensagem;
+- visualizar LinkedIn;
+- escolher responsável;
+- adicionar etiqueta;
+- criar ou concluir follow-up;
+- consultar histórico da empresa;
+- apagar o card com confirmação.
+
+Score e blocos de enriquecimento antigo não orientam mais a operação.
+
+## 6. Follow-ups
+
+Todo follow-up pertence a quem o criou.
+
+- pode estar vinculado a um lead ou a um projeto;
+- todos podem vê-lo;
+- somente o responsável recebe o e-mail;
+- a preferência de e-mail fica em **Configurações**;
+- tarefas vencidas aparecem no sino;
+- a visão `Equipe` mostra tarefas compartilhadas;
+- concluir a tarefa interrompe novos lembretes.
+
+## 7. Agendamento
+
+Na etapa **Agendamento**, copie o texto e envie pelo LinkedIn. O lead escolhe
+um slot no Google Appointment Schedule. O Google cria evento, Meet e
+confirmação.
+
+O n8n atualiza o Supabase. Quando há casamento único, o card vai para
+**Call marcada** e exibe `DD/MM/AAAA HH:mm`.
+
+Se a call for remarcada, o novo horário substitui o anterior. Se for cancelada
+e não existir outra reserva ativa, o card volta para **Agendamento**.
+
+## 8. Projetos
+
+Projetos podem vir de uma call ou ser criados manualmente.
+
+Campos:
+
+- nome e empresa;
+- responsável;
+- etapa;
+- descrição;
+- próxima ação e data;
+- valor estimado;
+- observações.
+
+Etapas:
 
 ```text
-Perfeito, {Nome}. Para facilitar, deixei alguns horarios livres na minha
-agenda aqui: {link}. Se nenhum fizer sentido, me avise que buscamos outro.
+Pos-call -> Proposta -> Negociação -> Projeto -> Ganho / Perdido
 ```
 
-O `{link}` vem de `app_settings.calendar_booking.booking_url`. Se ele nao
-estiver configurado, o CRM avisa antes da copia; nao inventa um link.
+O valor pode ser editado no card expandido. O dashboard soma os valores por
+etapa.
 
-A mensagem longa de apresentação não é usada como nota do convite. Ela fica
-disponível apenas depois que o operador registra `conexao_aceita`.
+No mesmo detalhe do projeto, use **Adicionar** em **Follow-ups** para criar um
+lembrete com data, horário e próxima ação. O card compacto exibe o próximo
+follow-up aberto. A tarefa também aparece na página **Follow-ups**, no sino e
+na fila de e-mail do responsável.
 
-## Follow-ups
+## 9. Exclusões
 
-Um follow-up e um lembrete compartilhado, associado a um lead, com:
-
-- data e hora (`due_at`);
-- descricao da proxima acao;
-- estado aberto, concluido ou cancelado;
-- autor e horario de conclusao quando aplicavel.
-
-Ele aparece tanto no detalhe do card quanto na pagina **Follow-ups**. Nenhuma
-automacao externa e necessaria para essa primeira versao.
-
-## Pipeline comercial
-
-Projetos podem ser criados a partir de um lead com call marcada ou manualmente
-por qualquer operador. Campos:
-
-- nome;
-- empresa;
-- responsavel;
-- etapa;
-- descricao;
-- proxima acao e data;
-- valor estimado opcional;
-- observacoes.
-
-Etapas: `Pos-call`, `Proposta`, `Negociacao`, `Projeto`, `Ganho` e `Perdido`.
-Os projetos nao dependem de uma origem de lead.
-
-## Agenda e n8n
-
-O n8n nao recebe credenciais do frontend. O workflow de agenda usa uma
-credencial de servidor e atualiza `calendar_bookings` no Supabase. Ao encontrar
-o lead correspondente, move-o para `call_marcada`; reservas sem correspondencia
-permanecem `unmatched` para revisao.
-
-O workflow nao foi automatizado por esta interface. Antes de ativar, testar uma
-reserva interna com os socios da AGF e confirmar no CRM: empresa, contato,
-horario e link do Meet.
+Leads e projetos possuem botão de exclusão no detalhe. A aplicação sempre pede
+confirmação. Excluir um projeto vinculado restaura o lead conforme a RPC
+transacional definida no banco.

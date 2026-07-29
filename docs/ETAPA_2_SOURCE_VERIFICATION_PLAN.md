@@ -1,5 +1,9 @@
 # Etapa 2 — descoberta estrutural por rankings
 
+> **Plano suspenso.** A descoberta foi desacoplada do CRM. Rankings, notícias,
+> Gemini e contagem do LinkedIn não fazem parte do produto ativo. Este arquivo
+> permanece apenas como pesquisa histórica.
+
 **Estado:** plano revisado; nenhuma migration, workflow ou alteração de banco
 foi implementada.
 

@@ -1,5 +1,9 @@
 # Etapa 0 — alinhamento do schema
 
+> **Histórico concluído.** Este documento registra a transição de schema
+> executada em julho de 2026. Para o modelo vigente, consulte
+> [AGF_DATA_MODEL.md](./AGF_DATA_MODEL.md).
+
 Data: 23 de julho de 2026.
 
 Este documento registra o resultado da Etapa 0 do plano de construção. Ele não

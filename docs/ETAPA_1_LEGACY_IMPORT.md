@@ -1,5 +1,9 @@
 # Etapa 1 — importação única dos leads legados
 
+> **Histórico concluído.** O script foi executado e arquivado. Novas entradas
+> usam bases CSV nomeadas; consulte
+> [AGF_CRM_MANUAL_OPERATION.md](./AGF_CRM_MANUAL_OPERATION.md).
+
 **Estado:** concluída em 23 de julho de 2026; importador arquivado e bloqueado.
 
 ## Fonte e escopo

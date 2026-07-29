@@ -1,99 +1,82 @@
 # AGF CRM
 
-Aplicacao web compartilhada para a operacao comercial da AGF. O Supabase e a
-fonte de verdade dos cards, follow-ups, agenda e projetos.
+Aplicação web compartilhada para organizar a prospecção e o pipeline comercial
+da AGF Capital. O Supabase é a fonte de verdade. A descoberta dos leads fica
+fora do CRM; a entrada atual é um CSV já filtrado, normalmente exportado do
+Apollo.
 
-## Escopo atual
-
-A descoberta e a filtragem de leads continuam desacopladas do CRM. A entrada
-temporaria definida e um CSV ja filtrado, normalmente exportado do Apollo. Uma
-lista longa e carregada uma unica vez em um banco de espera no Supabase; o
-operador escolhe quantos leads serao liberados gradualmente para o Kanban.
-
-O CRM opera os leads que ja existem na base:
+## Fluxo atual
 
 ```text
-Base de clientes
-  -> Enviar convite (manual no LinkedIn)
+CSV filtrado
+  -> base nomeada no Banco de leads
+  -> liberação gradual para Base de clientes
+  -> Enviar convite
   -> Convite pendente
-  -> Conexao aceita (confirmacao manual)
-  -> Mensagem enviada (manual no LinkedIn)
+  -> Conexão aceita
+  -> Mensagem enviada
   -> Em conversa
-  -> Agendamento (copiar o link da agenda)
-  -> Call marcada (atualizada pelo Calendar/n8n)
+  -> Agendamento
+  -> Call marcada
+  -> Criar projeto
 
-Call marcada -> Projeto comercial, quando aplicavel
-Qualquer etapa -> Descartado, quando nao houver interesse ou fit
+Sem continuidade -> Descartado
 ```
 
-Nao ha automacao de convite, mensagem ou resposta do LinkedIn. O CRM abre o
-perfil e deixa o texto pronto para copiar; o operador executa a acao no
-LinkedIn e registra o resultado no card.
+Convites, mensagens e respostas no LinkedIn são manuais. O CRM abre o perfil,
+prepara os textos, copia o conteúdo e registra a ação. Arrastar um card para a
+etapa seguinte equivale a confirmar a ação correspondente.
 
-## Recursos implementados no frontend
+## Recursos implementados
 
-- autenticacao por e-mail e senha do Supabase, com base e Kanban
-  compartilhados;
-- Kanban horizontal: uma coluna por etapa, rolagem lateral e rolagem interna
-  de cards, sem quebrar etapas em uma segunda linha;
-- detalhe expansivel do lead, perfil LinkedIn, score, contexto, historico e
-  texto editavel para a mensagem longa;
-- nota de convite e mensagem de agenda para copiar;
-- registro manual de convite, aceite, mensagem enviada, resposta e avancos de
-  etapa;
-- follow-ups por data e hora, visiveis para toda a equipe;
-- agenda de calls confirmadas;
-- pipeline comercial independente, inclusive para projetos criados sem lead;
-- configuracao do link publico da agenda.
-- banco de leads para listas longas, com importacao em lote, deduplicacao
-  global e liberacao configuravel de 1 a 100 cards por vez.
+- autenticação com e-mail e senha pelo Supabase;
+- mesma base, Kanban e projetos para todos os usuários;
+- busca global de leads;
+- Kanban horizontal com retorno de etapas e rolagem por coluna;
+- cards compactos com LinkedIn, cópia de mensagem e ação principal;
+- detalhe expansível, edição, histórico, etiquetas e responsável;
+- cadastro manual e exclusão protegida de leads;
+- Banco de leads para CSVs extensos:
+  - formato Apollo validado;
+  - bases nomeadas e independentes;
+  - deduplicação interna e global;
+  - normalização de acentos;
+  - liberação de 1 a 100 leads da base escolhida;
+- follow-ups individuais para leads e projetos, com sino, visão da equipe e e-mail via n8n;
+- alerta visual para cards parados;
+- Google Appointment Schedule com atualização automática da call;
+- tratamento de criação, remarcação e cancelamento;
+- pipeline comercial independente com criação manual;
+- valor dos projetos por etapa no dashboard;
+- conversão por origem, região e setor.
 
-## Banco e migration atual
-
-As migrations historicas e a transicao de schema continuam em
-`supabase/migrations/`. A extensao atual do CRM manual e:
-
-`supabase/migrations/20260724000100_manual_crm_operations.sql`
-
-Ela cria:
-
-- `lead_follow_ups`;
-- `commercial_projects`;
-- a configuracao `app_settings.calendar_booking`.
-
-As migrations `20260728000100_long_list_lead_pool.sql` e
-`20260728000200_lead_pool_dashboard_totals.sql` adicionam:
-
-- lotes de importacao (`lead_import_batches`);
-- banco de espera (`lead_pool`);
-- RPC unica para importar ate 5.000 linhas;
-- RPC atomica para liberar os proximos N leads;
-- deduplicacao por empresa, contato, LinkedIn e IDs do Apollo;
-- configuracao persistente da quantidade padrao.
-
-Execute as migrations pelo Supabase CLI antes de usar esses recursos em uma
-base remota:
-
-```powershell
-npx supabase db push
-```
-
-## Integracao com agenda
-
-O unico workflow externo previsto para esta fase e:
+## Arquitetura
 
 ```text
-Google Calendar / pagina de agendamento
-  -> webhook n8n autenticado
-  -> calendar_bookings no Supabase
-  -> card em Call marcada no CRM
+Navegador
+  -> servidor web local/produção
+  -> Supabase Auth + REST/RPC
+
+CSV Apollo
+  -> parser no navegador
+  -> RPC de importação
+  -> lead_import_batches + lead_pool
+
+Google Calendar
+  -> n8n
+  -> RPC de sincronização
+  -> calendar_bookings + atualização do lead
+
+Follow-up vencido
+  -> fila idempotente no Supabase
+  -> n8n
+  -> Gmail do responsável
 ```
 
-O link publico da pagina de agendamento e salvo no painel Configuracoes. A
-conta usada nos testes pode ser trocada depois pela agenda do Giulio, sem mudar
-o CRM.
+Segredos de servidor, credenciais Google e tokens do n8n nunca ficam no
+frontend.
 
-## Aplicacao local
+## Aplicação local
 
 Requisito: Node.js 18 ou superior.
 
@@ -101,27 +84,45 @@ Requisito: Node.js 18 ou superior.
 node .\prototype-agf-crm\server.mjs
 ```
 
-Abra `http://localhost:4173` e configure
-`prototype-agf-crm/.env.local` a partir do `.env.example`:
+Abra `http://localhost:4173`.
+
+Crie `prototype-agf-crm/.env.local` a partir de `.env.example`:
 
 ```text
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
-Nunca inclua `service_role`, token do n8n, token do PhantomBuster ou chave de
-IA no frontend.
+Use somente a chave publicável. Nunca inclua `service_role` no arquivo da
+aplicação.
 
-## Documentacao
+## Banco
 
-- [Status da plataforma](./docs/AGF_PLATFORM_STATUS.md)
-- [Operacao manual do CRM](./docs/AGF_CRM_MANUAL_OPERATION.md)
-- [Contrato do callback de agenda no n8n](./docs/N8N_CALENDAR_CALLBACK_CONTRACT.md)
-- [Alinhamento de schema da Etapa 0](./docs/ETAPA_0_SCHEMA_ALIGNMENT.md)
-- [Importacao legada da Etapa 1](./docs/ETAPA_1_LEGACY_IMPORT.md)
-- [Plano historico de verificacao de fonte](./docs/ETAPA_2_SOURCE_VERIFICATION_PLAN.md)
-- [Briefing historico](./docs/AGF_PROJECT_BRIEF.md)
+As migrations ficam em `supabase/migrations/` e são aplicadas por:
 
-Os documentos de descoberta, ranking, PhantomBuster, Apollo e saved searches
-permanecem como referencia historica. Eles nao definem o comportamento atual
-do CRM enquanto a estrategia de extracao esta em decisao.
+```powershell
+npx supabase db push
+```
+
+As migrations mais recentes adicionam:
+
+- operações manuais e projetos;
+- ciclo de vida completo de reservas;
+- importação de listas longas;
+- etiquetas e responsáveis;
+- idade da etapa;
+- follow-ups individuais e fila de e-mail;
+- follow-ups vinculados a leads ou projetos;
+- bases de leads nomeadas.
+
+## Testes
+
+```powershell
+node --check .\prototype-agf-crm\crm.js
+Get-ChildItem .\prototype-agf-crm\test\*.test.mjs |
+  ForEach-Object { node $_.FullName }
+```
+
+## Documentação
+
+Comece pelo [índice da documentação](./docs/DOCUMENTATION_INDEX.md).

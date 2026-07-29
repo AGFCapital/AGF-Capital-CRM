@@ -1,5 +1,8 @@
 # AGF — filtros e saved searches do LinkedIn
 
+> **Referência histórica.** Estas buscas podem apoiar a montagem externa de
+> listas, mas não são executadas nem impostas pelo CRM atual.
+
 **Atualizado em:** 23 de julho de 2026
 **Escopo:** prospecção de implementação de IA em finanças corporativas. As buscas abaixo alimentam apenas as bases `Vagas — leads quentes` e `Middle market — prospecção proativa`.
 

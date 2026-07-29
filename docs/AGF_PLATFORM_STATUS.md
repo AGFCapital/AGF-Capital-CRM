@@ -1,103 +1,123 @@
 # Status da plataforma AGF
 
-Atualizado em 28 de julho de 2026.
+Atualizado em 29 de julho de 2026.
 
-## Marco atual
+## Resumo executivo
 
-**O CRM opera manualmente o relacionamento e agora possui um banco de espera
-para listas longas.** A descoberta e a filtragem continuam fora do produto.
-Uma lista CSV ja filtrada pode ser carregada uma unica vez e liberada
-gradualmente para o Kanban.
+O CRM manual está funcional em ambiente de teste, com Supabase remoto,
+Calendar e follow-ups por e-mail. A extração foi desacoplada. A entrada atual
+é um CSV filtrado armazenado em bases nomeadas, liberadas gradualmente para o
+Kanban.
 
-As entregas historicas permanecem validas:
+## Implementado
 
-- Etapa 0 de alinhamento de schema aplicada;
-- Etapa 1 concluiu a importacao unica de 60 leads em `revisao_manual`, sem
-  sinais legados;
-- nenhum workflow de descoberta, verificacao de ranking, Gemini ou
-  PhantomBuster foi ativado a partir deste redirecionamento.
+### CRM
 
-## CRM manual — implementado localmente
+- login por e-mail e senha;
+- dados compartilhados entre operadores;
+- Kanban horizontal com avanço, retorno e descarte;
+- ações no card compacto e no detalhe;
+- busca global;
+- cadastro e exclusão de leads;
+- etiquetas, responsável e histórico por empresa;
+- alerta de tempo parado;
+- datas no padrão `DD/MM/AAAA HH:mm`;
+- dashboard de operação e conversão;
+- pipeline comercial editável;
+- follow-ups criados e concluídos também no detalhe de projetos;
+- valor de projetos por etapa.
 
-- login Supabase e base compartilhada;
-- Kanban horizontal, sem quebra de colunas, com rolagem interna de cards;
-- fluxo manual de convite, aceite, mensagem, conversa e agendamento;
-- detalhe expansivel de lead com perfil, score, contexto, mensagem e historico;
-- follow-ups por data e hora;
-- agenda de calls marcadas;
-- pipeline comercial independente e criacao manual de projetos;
-- configuracao do link publico da agenda;
-- importacao atomica de ate 5.000 linhas para o banco de leads;
-- painel com disponiveis, liberados, duplicados e lotes recentes;
-- quantidade padrao configuravel e liberacao de 1 a 100 leads por operacao;
-- deduplicacao global sem criar todos os cards ao mesmo tempo;
-- deteccao de UTF-8/Windows-1252 e reparo seguro de nomes com acentos
-  corrompidos no CSV.
+### Banco de leads
 
-As colunas operacionais `Encerrado` e `Ja prospectado` foram removidas. Interesse
-comercial resulta em projeto; ausencia de interesse resulta em descarte.
+- parser compatível com o CSV Apollo validado;
+- normalização de acentos;
+- deduplicação dentro do CSV e em todo o CRM;
+- upload único em lote;
+- nome obrigatório da base;
+- seletor de base durante a liberação;
+- liberação atômica de 1 a 100 leads;
+- painel rolável com últimas bases;
+- base inicial renomeada para `Base Middle-Market 1`.
 
-O texto de convite/agendamento e copiado pelo operador e o LinkedIn nunca e
-automatizado nesta fase.
+### Follow-ups
 
-## Migrations remotas confirmadas
+- responsável igual ao criador;
+- vínculo exclusivo com um lead ou um projeto;
+- sino com `Minhas notificações` e `Equipe`;
+- conclusão manual;
+- preferência individual de e-mail;
+- fila idempotente no Supabase;
+- workflow n8n/Gmail conectado.
 
-`supabase/migrations/20260724000100_manual_crm_operations.sql` adiciona:
+### Agenda
 
-- `lead_follow_ups`;
-- `commercial_projects`;
-- `app_settings.calendar_booking`.
+- link público configurável;
+- card mostra data e hora;
+- criação, remarcação e cancelamento tratados;
+- casamento por e-mail, empresa ou nome conservador;
+- reserva mais recente prevalece;
+- reservas incertas permanecem `unmatched`;
+- fluxo testado internamente com sócios.
 
-As migrations `20260724000100`, `20260727000100`, `20260727000200`,
-`20260728000100` e `20260728000200` constam como aplicadas no projeto remoto.
+## Integrações
 
-As migrations de 28 de julho adicionam:
+| Integração | Estado atual |
+|---|---|
+| Supabase | conectado e fonte de verdade |
+| Google Calendar | conectado em conta de teste |
+| n8n Calendar | funcional no ambiente de teste |
+| n8n Follow-up/Gmail | conectado e ativo |
+| LinkedIn | manual |
+| Apollo | exportação CSV externa |
+| Google Sheets | fora do fluxo |
+| PhantomBuster | fora do fluxo |
+| Gemini | fora do fluxo |
+
+## Banco remoto
+
+As migrations até
+`20260729000800_project_follow_ups.sql` foram aplicadas.
+
+Principais extensões recentes:
 
 - `lead_import_batches` e `lead_pool`;
-- configuracao `app_settings.lead_pool_release`;
-- RPCs `import_lead_pool`, `release_lead_pool` e `lead_pool_dashboard`;
-- importacao unica e liberacao atomica com `FOR UPDATE SKIP LOCKED`.
+- ciclo de vida de `calendar_bookings`;
+- `profiles.notification_email`;
+- propriedade de follow-up;
+- `follow_up_email_deliveries`;
+- RPCs de leads/projetos manuais;
+- etiquetas e idade da etapa;
+- `display_name` nas bases;
+- importação e liberação por base;
+- follow-ups unificados para leads e projetos.
 
-As migrations de 27 de julho adicionam:
+## Testes atuais
 
-- IDs Apollo em empresas e contatos;
-- e-mail de contato para casamento de reserva;
-- auditoria em `integration_events`;
-- RPC atômica `ingest_apollo_lead`;
-- RPC atômica `sync_google_calendar_booking`;
-- preservacao dos dados originais em notificacoes de cancelamento.
+Os contratos locais cobrem:
 
-O `supabase db lint --linked --level warning` foi executado apos a aplicacao e
-nao encontrou erros de schema.
+- carregamento do CRM;
+- utilitários e busca;
+- normalização de CSV;
+- interações do Kanban;
+- bases nomeadas;
+- rolagem do Banco de leads;
+- sidebar fixa e responsiva;
+- follow-ups de projetos e compatibilidade da fila de e-mail.
 
-## Integracoes no escopo atual
+## Pendências para produção
 
-| Integracao | Papel atual | Estado |
-|---|---|---|
-| Supabase | autenticacao e fonte de verdade do CRM | conectado no ambiente de teste |
-| Google Calendar | pagina publica de agenda e criacao de evento/Meet | conta de teste conectada; criacao, remarcacao e cancelamento monitorados |
-| n8n | sincronizacao de reservas do Calendar | workflow ativo com triggers separados de criacao, atualizacao e cancelamento |
-| LinkedIn | convite e mensagens enviados pelo operador | manual |
-| Apollo | descoberta externa e exportacao CSV | a lista filtrada entra pelo banco de leads; o webhook n8n fica inativo como alternativa futura |
-| PhantomBuster / planilha | alternativas historicas de entrada | fora do CRM ate decisao comercial |
-| Gemini | contexto e redacao futuros | fora do CRM ate decisao da extracao |
+1. trocar a agenda de teste pela conta definitiva do Giulio;
+2. executar teste ponta a ponta com o workflow definitivo;
+3. validar destinatários reais dos e-mails de follow-up;
+4. revisar RLS e variáveis no ambiente de produção;
+5. publicar no domínio da AGF;
+6. definir rotina operacional de geração dos próximos CSVs;
+7. acompanhar uso do plano gratuito do Supabase e migrar apenas se métricas
+   reais exigirem.
 
-## Proximo teste de ponta a ponta
+## Decisões congeladas
 
-1. criar os segredos privados dos dois webhooks no n8n;
-2. confirmar a credencial Supabase nos nodes HTTP;
-3. confirmar a credencial e a agenda da conta de teste nos triggers Calendar;
-4. manter a pergunta obrigatoria `Empresa` no Appointment Schedule;
-5. escolher um socio da AGF como lead interno;
-6. fazer uma reserva interna e verificar se o workflow n8n atualiza
-   `calendar_bookings`, move o card para `call_marcada` e exibe o horario;
-7. reenviar o mesmo evento e confirmar idempotencia;
-8. importar um CSV interno para o banco de espera;
-9. liberar um grupo pequeno e confirmar os cards na Base de clientes;
-10. repetir a liberacao e confirmar que nenhum registro e duplicado.
-
-## Referencias historicas congeladas
-
-Os planos de ranking, fontes, saved searches, PhantomBuster e Apollo continuam
-arquivados como pesquisa. Eles nao devem ser interpretados como workflow ativo
-nem acionados pelo frontend atual.
+- LinkedIn permanece manual;
+- score não orienta a interface operacional;
+- extração não será construída antes da decisão comercial;
+- documentos de PhantomBuster, rankings e saved searches são históricos.

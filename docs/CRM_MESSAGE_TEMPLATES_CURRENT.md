@@ -1,16 +1,14 @@
 # Modelos de mensagem atuais do CRM
 
-Versao observada no codigo em 29 de julho de 2026. Este arquivo registra os
-textos reutilizaveis atuais para revisao; ele nao substitui a configuracao da
-aplicacao.
+Versão do código em 29 de julho de 2026.
 
-## 1. Nota do convite de conexao
+## Nota do convite
 
 ```text
 {Nome}, tudo bem? Tenho conversado com empresas como a {Empresa} sobre como aplicar IA no financeiro de forma prática. Achei que faria sentido nos conectarmos por aqui.
 ```
 
-## 2. Mensagem apos o aceite da conexao
+## Mensagem após o aceite
 
 ```text
 {Nome}, tudo bem? Obrigado por aceitar o convite.
@@ -24,21 +22,26 @@ Eu venho de mais de 10 anos entre banking e corporate development e também fund
 Topa uma conversa de 15 a 30 minutos para eu me apresentar e entender melhor o momento da {Empresa}?
 ```
 
-## 3. Mensagem de agendamento
+## Mensagem de agendamento
 
 ```text
 Perfeito, {Nome}. Para facilitar, deixei alguns horarios livres na minha agenda aqui: {link}. Se nenhum fizer sentido, me avise que buscamos outro.
 ```
 
-## 4. Agradecimento depois da reserva
+## Agradecimento após a reserva
 
 ```text
 Perfeito, {Nome}. Obrigado por agendar. Nossa conversa ficou marcada para {data_hora}. Até lá!
 ```
 
-## Observacao sobre leads legados
+## Variáveis
 
-Alguns leads importados da planilha historica ainda podem exibir um rascunho
-individual salvo anteriormente. Isso nao constitui um quinto template
-reutilizavel. Leads vindos do Apollo ou do Banco de leads usam o modelo
-principal acima.
+| Variável | Origem |
+|---|---|
+| `{Nome}` | primeiro nome do contato |
+| `{Empresa}` | empresa do lead |
+| `{link}` | `app_settings.calendar_booking.booking_url` |
+| `{data_hora}` | reserva ativa mais recente |
+
+Leads legados podem conservar um rascunho individual histórico. Novos leads
+manuais e importados usam o modelo padrão.
