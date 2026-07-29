@@ -54,9 +54,9 @@ O Kanban so aceita arrastar o card para a proxima etapa permitida. As acoes que
 dependem de uma atividade humana no LinkedIn permanecem em botoes explicitos,
 para gravar data e historico corretamente.
 
-## Texto de convite e agendamento
+## Nota de convite e texto de agendamento
 
-O texto aprovado para copiar e:
+Na etapa **Enviar convite**, o botão **Copiar nota** usa:
 
 ```text
 Perfeito, {Nome}. Para facilitar, deixei alguns horarios livres na minha
@@ -65,6 +65,9 @@ agenda aqui: {link}. Se nenhum fizer sentido, me avise que buscamos outro.
 
 O `{link}` vem de `app_settings.calendar_booking.booking_url`. Se ele nao
 estiver configurado, o CRM avisa antes da copia; nao inventa um link.
+
+A mensagem longa de apresentação não é usada como nota do convite. Ela fica
+disponível apenas depois que o operador registra `conexao_aceita`.
 
 ## Follow-ups
 

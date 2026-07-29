@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Atualizar um card existente quando uma reserva confirmada for criada na pagina
-de agendamento conectada ao Google Calendar. Este e o unico fluxo n8n ativo no
-escopo manual atual.
+Atualizar um card existente quando uma reserva for criada, remarcada ou
+cancelada na pagina de agendamento conectada ao Google Calendar. Este e o
+unico fluxo n8n ativo no escopo manual atual.
 
 ## Limites
 
@@ -36,9 +36,15 @@ evento e `AGF - Giulio / Empresa - Nome do lead`.
 2. Fazer upsert de `calendar_bookings` por `provider_event_id`, sempre
    preservando o payload em `raw_payload`.
 3. Procurar o lead por correspondencia deterministica, nesta ordem:
-   - e-mail do convidado, se houver campo confiavel futuro;
+   - e-mail exato do convidado, quando cadastrado no contato;
    - nome da empresa informado, normalizado e comparado a `companies`;
-   - contato/nome, somente se for uma correspondencia unica.
+   - contato/nome exato, somente se for uma correspondencia unica;
+   - fallback de nome com no maximo uma insercao, remocao ou substituicao,
+     primeiro nome identico e exatamente um candidato ativo. Se o formulario
+     informar empresa, ela tambem deve coincidir.
+   Depois de um fallback seguro, o e-mail do formulario e salvo no contato
+   quando o CRM ainda nao possui e-mail. As proximas atualizacoes passam a
+   usar igualdade exata.
 4. Se nao houver correspondencia unica, gravar:
    - `lead_id = null`;
    - `match_status = 'unmatched'`;
@@ -50,6 +56,16 @@ evento e `AGF - Giulio / Empresa - Nome do lead`.
    - gravar inicio, fim, Meet e status da reserva;
    - atualizar `leads.current_stage = 'call_marcada'`;
    - adicionar atividade indicando que a reserva foi recebida pela agenda.
+6. Se o mesmo evento mudar de horario, atualizar a mesma linha e registrar a
+   remarcacao.
+7. Se o lead criar outro evento, manter as duas linhas e considerar como ativa
+   a reserva com `provider_created_at` mais recente.
+8. Ao cancelar:
+   - ignorar a reserva cancelada na interface;
+   - manter `call_marcada` se existir outra reserva ativa;
+   - voltar de `call_marcada` para `agendamento` se nenhuma reserva ativa
+     permanecer;
+   - nunca regredir um lead que ja esteja em estagio terminal ou em Projetos.
 
 ## Idempotencia
 
@@ -71,8 +87,9 @@ Antes de qualquer lead externo:
 
 ## Falhas
 
-- reserva sem empresa ou com empresa ambigua: `unmatched`, sem mutacao de lead;
-- evento cancelado: atualizar `calendar_bookings.status = 'cancelled'`; a
-  decisao de devolver o card ao funil continua humana;
+- reserva sem identificacao suficiente ou com mais de um candidato:
+  `unmatched`, sem mutacao de lead;
+- evento cancelado: atualizar `calendar_bookings.status = 'cancelled'` e
+  aplicar deterministicamente a regra da reserva ativa mais recente;
 - erro no workflow: registrar a falha no n8n e manter o evento no Calendar;
 - nao criar ou apagar leads para compensar um casamento incerto.

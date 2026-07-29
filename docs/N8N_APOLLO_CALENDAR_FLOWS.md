@@ -74,19 +74,25 @@ Arquivo importável:
 
 Fluxo:
 
-1. monitorar eventos criados e atualizados na agenda conectada;
+1. monitorar eventos criados, atualizados e cancelados na agenda conectada;
 2. normalizar ID, início, fim, título, Meet, convidado e resposta `Empresa`;
 3. casar o lead, nesta ordem:
    - e-mail exato;
    - empresa normalizada;
    - nome exato e único;
+   - fallback de nome com primeiro nome idêntico, distância máxima de uma
+     letra e exatamente um candidato ativo. Se houver empresa no formulário,
+     ela precisa coincidir;
 4. fazer upsert em `calendar_bookings` por `provider_event_id`;
 5. mover para `call_marcada` somente quando houver casamento único;
 6. manter reservas ambíguas como `unmatched`, com `raw_payload`;
-7. deixar cancelamentos registrados sem decidir automaticamente o novo estágio.
+7. mostrar sempre a reserva ativa criada mais recentemente;
+8. se a reserva mais recente for cancelada, manter outra reserva ativa ou
+   devolver o card para `agendamento` quando nenhuma permanecer.
 
 Para o casamento por empresa funcionar, a página do Appointment Schedule deve
-manter a pergunta obrigatória `Empresa`.
+manter a pergunta obrigatória `Empresa`. Sem essa resposta, o sistema ainda
+pode casar por e-mail exato ou pelo fallback conservador de nome.
 
 ## Variáveis e credenciais no n8n
 

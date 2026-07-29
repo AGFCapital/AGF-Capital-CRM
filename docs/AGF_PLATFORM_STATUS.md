@@ -75,8 +75,8 @@ nao encontrou erros de schema.
 | Integracao | Papel atual | Estado |
 |---|---|---|
 | Supabase | autenticacao e fonte de verdade do CRM | conectado no ambiente de teste |
-| Google Calendar | pagina publica de agenda e criacao de evento/Meet | conta de teste conectada; triggers de criacao e atualizacao preparados, ainda inativos |
-| n8n | sincronizacao de reservas do Calendar | workflow criado e salvo, ainda inativo ate o piloto |
+| Google Calendar | pagina publica de agenda e criacao de evento/Meet | conta de teste conectada; criacao, remarcacao e cancelamento monitorados |
+| n8n | sincronizacao de reservas do Calendar | workflow ativo com triggers separados de criacao, atualizacao e cancelamento |
 | LinkedIn | convite e mensagens enviados pelo operador | manual |
 | Apollo | descoberta externa e exportacao CSV | a lista filtrada entra pelo banco de leads; o webhook n8n fica inativo como alternativa futura |
 | PhantomBuster / planilha | alternativas historicas de entrada | fora do CRM ate decisao comercial |
