@@ -76,8 +76,9 @@ com criação mais recente.
 
 ## Follow-ups e e-mail
 
-`lead_follow_ups.assigned_to` identifica quem criou a tarefa. Cada registro
-possui exatamente um pai:
+`lead_follow_ups.created_by` identifica quem criou a tarefa.
+`lead_follow_ups.assigned_to` identifica o responsável atual do card pai e,
+portanto, quem recebe a notificação. Cada registro possui exatamente um pai:
 
 - `lead_id` para uma tarefa da prospecção; ou
 - `project_id` para uma tarefa do pipeline comercial.
@@ -95,6 +96,10 @@ vinculados simultaneamente aos dois domínios.
 
 O workflow de e-mail nunca decide quem recebe: ele consome o destinatário já
 resolvido pelo banco.
+
+Ao trocar `leads.responsible_id` ou `commercial_projects.responsible_id`, o
+banco propaga o novo responsável aos follow-ups abertos e às entregas ainda
+não enviadas. Uma entrega já enviada permanece histórica e não é reescrita.
 
 ## Configurações
 

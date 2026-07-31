@@ -11,6 +11,7 @@ const importerSource = fs.readFileSync(path.join(here, "..", "apollo-import.js")
 const poolMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000100_long_list_lead_pool.sql"), "utf8");
 const bookingLifecycleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000300_calendar_booking_lifecycle.sql"), "utf8");
 const followUpOwnershipMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260729000400_follow_up_ownership_and_manual_operations.sql"), "utf8");
+const followUpCardResponsibleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260731000100_follow_up_recipient_follows_card_responsible.sql"), "utf8");
 
 assert.match(source, /const stageDropTargets = \{/,
   "Cada coluna operacional deve declarar a etapa que conclui ao receber um card.");
@@ -84,8 +85,14 @@ assert.match(source, /function notifyDueFollowUps\(/,
   "Follow-ups vencidos ou proximos devem gerar alerta no CRM.");
 assert.match(source, /scheduleFollowUpNotifications\(\)/,
   "A verificacao de follow-ups deve continuar ativa durante a sessao.");
-assert.match(source, /assigned_to:\s*state\.remote\.session\.user\.id/,
-  "Todo novo follow-up deve pertencer ao usuario que o criou.");
+assert.doesNotMatch(source, /assigned_to:\s*state\.remote\.session\.user\.id/,
+  "O frontend nao pode enviar o criador como destinatario do follow-up.");
+assert.match(source, /const owner = responsibleProfile\(entity\?\.responsibleId\)/,
+  "A interface deve validar o responsavel atual do card antes de criar o follow-up.");
+assert.match(followUpCardResponsibleMigrationSource, /create or replace function public\.assign_follow_up_creator\(\)/,
+  "O banco deve resolver o destinatario a partir do card pai.");
+assert.match(followUpCardResponsibleMigrationSource, /leads_propagate_responsible_to_follow_ups/,
+  "Trocar o responsavel do lead deve atualizar follow-ups ainda pendentes.");
 assert.match(source, /data-notification-view="mine"/,
   "O sino deve abrir com uma visualizacao individual.");
 assert.match(source, /data-notification-view="team"/,

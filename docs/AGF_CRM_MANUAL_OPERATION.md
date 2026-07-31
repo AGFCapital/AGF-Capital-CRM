@@ -72,11 +72,13 @@ Score e blocos de enriquecimento antigo não orientam mais a operação.
 
 ## 6. Follow-ups
 
-Todo follow-up pertence a quem o criou.
+Todo follow-up é atribuído ao responsável atual do card. Quem criou a tarefa
+continua registrado apenas no histórico.
 
 - pode estar vinculado a um lead ou a um projeto;
 - todos podem vê-lo;
 - somente o responsável recebe o e-mail;
+- trocar o responsável do card transfere os lembretes ainda não enviados;
 - a preferência de e-mail fica em **Configurações**;
 - tarefas vencidas aparecem no sino;
 - a visão `Equipe` mostra tarefas compartilhadas;

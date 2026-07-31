@@ -19,6 +19,7 @@ chave publicavel do Supabase. Nunca use `service_role` neste arquivo.
 - opera o Kanban de leads ja existentes;
 - guia convite, aceite, mensagem e agendamento manuais no LinkedIn;
 - registra follow-ups de leads e projetos comerciais;
+- envia cada lembrete somente ao responsável atual do card;
 - exibe chamadas devolvidas pelo Google Calendar/n8n;
 - permite configurar o link publico da agenda.
 - importa listas CSV ja filtradas para um banco de espera;

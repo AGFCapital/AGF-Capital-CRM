@@ -1,6 +1,6 @@
 # Status da plataforma AGF
 
-Atualizado em 29 de julho de 2026.
+Atualizado em 31 de julho de 2026.
 
 ## Resumo executivo
 
@@ -41,7 +41,9 @@ Kanban.
 
 ### Follow-ups
 
-- responsável igual ao criador;
+- destinatário sempre igual ao responsável atual do card;
+- criador preservado somente para auditoria;
+- troca de responsável atualiza follow-ups e entregas ainda não enviadas;
 - vínculo exclusivo com um lead ou um projeto;
 - sino com `Minhas notificações` e `Equipe`;
 - conclusão manual;
@@ -76,7 +78,7 @@ Kanban.
 ## Banco remoto
 
 As migrations até
-`20260729000800_project_follow_ups.sql` foram aplicadas.
+`20260731000100_follow_up_recipient_follows_card_responsible.sql` foram aplicadas.
 
 Principais extensões recentes:
 
@@ -90,6 +92,8 @@ Principais extensões recentes:
 - `display_name` nas bases;
 - importação e liberação por base;
 - follow-ups unificados para leads e projetos.
+- responsável estruturado também em projetos;
+- destinatário de follow-up derivado do responsável atual do card.
 
 ## Testes atuais
 

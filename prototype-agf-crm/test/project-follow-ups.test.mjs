@@ -9,11 +9,25 @@ const migration = fs.readFileSync(
   path.join(here, "..", "..", "supabase", "migrations", "20260729000800_project_follow_ups.sql"),
   "utf8",
 );
+const responsibleMigration = fs.readFileSync(
+  path.join(here, "..", "..", "supabase", "migrations", "20260731000100_follow_up_recipient_follows_card_responsible.sql"),
+  "utf8",
+);
 
 assert.match(
   migration,
   /add column project_id uuid\s+references public\.commercial_projects\(id\) on delete cascade/,
   "O mesmo registro de follow-up deve poder pertencer a um projeto.",
+);
+assert.match(
+  responsibleMigration,
+  /add column(?: if not exists)? responsible_id uuid\s+references public\.profiles\(id\) on delete set null/,
+  "Projetos devem ter um perfil responsavel, nao apenas um nome livre.",
+);
+assert.match(
+  responsibleMigration,
+  /projects_propagate_responsible_to_follow_ups/,
+  "Trocar o responsavel do projeto deve atualizar seus follow-ups pendentes.",
 );
 assert.match(
   migration,
@@ -50,6 +64,11 @@ assert.match(
   source,
   /project_id:\s*target\.type === "project" \? target\.id : null/,
   "A criação deve persistir o vínculo com o projeto.",
+);
+assert.match(
+  source,
+  /<select name="responsibleId" required>/,
+  "O responsavel do projeto deve ser escolhido entre os perfis da equipe.",
 );
 assert.match(
   source,

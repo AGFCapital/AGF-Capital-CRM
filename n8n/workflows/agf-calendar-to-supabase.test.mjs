@@ -59,6 +59,29 @@ assert.equal(
   'O normalizador deve reconhecer a pergunta "Nome da Empresa" do Appointment Schedule.',
 );
 
+const realGoogleAppointmentDescription = runNormalizer({
+  first: () => ({
+    json: {
+      id: "calendar-event-real-google-description",
+      status: "confirmed",
+      summary: "Teste CRM (André Müller)",
+      description: "<b>Booked by</b>\nAndré Müller\nmullern.andre@gmail.com\n<br><b>Nome da Empresa</b>\nagf capital",
+      start: { dateTime: "2026-08-03T11:00:00-03:00" },
+      end: { dateTime: "2026-08-03T11:30:00-03:00" },
+      attendees: [
+        { email: "caio@agfcapital.com.br", organizer: true, self: true },
+        { email: "mullern.andre@gmail.com", responseStatus: "accepted" },
+      ],
+    },
+  }),
+}, {});
+
+assert.equal(
+  realGoogleAppointmentDescription[0].json.payload.company_answer,
+  "agf capital",
+  "O normalizador deve extrair a resposta quando o Google envia o rótulo em HTML e o valor na linha seguinte.",
+);
+
 const genericCalendarEvent = runNormalizer({
   first: () => ({
     json: {

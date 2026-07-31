@@ -1,7 +1,7 @@
 # AGF CRM — contrato atual de integrações n8n
 
 **Versão:** 3.0
-**Atualizado em:** 29 de julho de 2026
+**Atualizado em:** 31 de julho de 2026
 
 ## 1. Escopo ativo
 
@@ -42,7 +42,12 @@ Regras:
 
 - `provider_event_id` é obrigatório e único;
 - preservar `raw_payload`;
-- casar por e-mail, empresa ou nome conservador;
+- converter a descrição HTML do Appointment Schedule em texto antes de ler
+  respostas personalizadas;
+- reconhecer `Nome da Empresa` tanto no formato `rótulo: valor` quanto no
+  formato real do Google, com rótulo e resposta em linhas separadas;
+- casar, nesta ordem, por e-mail exato, empresa normalizada com um único lead
+  ativo e nome completo conservador;
 - não escolher entre candidatos ambíguos;
 - mover para `call_marcada` apenas com match único;
 - considerar a reserva ativa criada mais recentemente;
@@ -55,6 +60,9 @@ Detalhes: [N8N_CALENDAR_CALLBACK_CONTRACT.md](./N8N_CALENDAR_CALLBACK_CONTRACT.m
 
 Objetivo: enviar uma notificação apenas ao responsável por um follow-up
 vencido ou próximo, seja ele de lead ou de projeto.
+
+O responsável é sempre o perfil atualmente atribuído ao card pai. O autor do
+follow-up é mantido apenas para auditoria e nunca define o destinatário.
 
 ### Fonte
 
@@ -78,6 +86,8 @@ O workflow lê `follow_up_email_deliveries` pendentes. A fila já contém:
 6. nunca enviar para o Giulio por cópia automática;
 7. respeitar `profiles.follow_up_email_enabled`;
 8. não enviar duas vezes a mesma entrega.
+9. nunca substituir o `recipient_email` recebido da fila por um endereço fixo
+   ou pelo e-mail do executor do workflow.
 
 ### Conteúdo mínimo
 

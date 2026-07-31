@@ -104,7 +104,8 @@ correspondência única fica `unmatched` e não move nenhum lead.
 
 Todos os usuários veem todos os leads, projetos e tarefas. Cada follow-up:
 
-- pertence a quem o criou;
+- pertence ao responsável atual do card pai;
+- preserva o criador apenas para auditoria;
 - pertence a exatamente um lead ou projeto;
 - tem data, horário e descrição;
 - aparece no sino do responsável;
@@ -114,6 +115,10 @@ Todos os usuários veem todos os leads, projetos e tarefas. Cada follow-up:
 
 Um lead pode ter responsável e etiqueta organizacional sem restringir a
 visibilidade.
+
+Projetos também possuem um perfil responsável estruturado. Alterar o
+responsável de um lead ou projeto transfere seus follow-ups abertos e as
+entregas de e-mail ainda não enviadas.
 
 ## 8. Pipeline comercial
 
