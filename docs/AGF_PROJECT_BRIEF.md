@@ -116,6 +116,10 @@ Todos os usuários veem todos os leads, projetos e tarefas. Cada follow-up:
 Um lead pode ter responsável e etiqueta organizacional sem restringir a
 visibilidade.
 
+As telas de leads e projetos oferecem um filtro compacto por responsável ao
+lado da busca. É possível selecionar qualquer membro da equipe ou `Todos`; isso
+afeta apenas a visualização local e não restringe a base compartilhada.
+
 Projetos também possuem um perfil responsável estruturado. Alterar o
 responsável de um lead ou projeto transfere seus follow-ups abertos e as
 entregas de e-mail ainda não enviadas.
@@ -144,6 +148,8 @@ O dashboard soma o valor dos projetos por etapa; não é um forecast
 probabilístico. O detalhe de cada projeto permite criar e concluir follow-ups;
 essas tarefas participam do mesmo sino, da mesma página de follow-ups e da
 mesma entrega de e-mail usada na prospecção.
+
+O responsável do projeto continua sendo o único destinatário dos follow-ups.
 
 ## 9. Visões da aplicação
 

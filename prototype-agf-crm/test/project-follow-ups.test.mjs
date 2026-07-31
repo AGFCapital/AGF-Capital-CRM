@@ -47,7 +47,7 @@ assert.match(
 
 assert.match(
   source,
-  /commercial_projects\?select=\*,lead_follow_ups\(id,due_at,note,status,completed_at,assigned_to\)/,
+  /commercial_projects\?select=\*,[^"\n]*lead_follow_ups\(id,due_at,note,status,completed_at,assigned_to\)/,
   "O carregamento dos projetos deve incluir seus follow-ups.",
 );
 assert.match(
@@ -67,7 +67,7 @@ assert.match(
 );
 assert.match(
   source,
-  /<select name="responsibleId" required>/,
+  /<select name="responsibleId"[^>]*required>/,
   "O responsavel do projeto deve ser escolhido entre os perfis da equipe.",
 );
 assert.match(
@@ -84,6 +84,17 @@ assert.match(
   source,
   /Follow-up:\s*\$\{humanDate\(due\.due_at\)\}/,
   "O card compacto de projeto deve exibir o próximo follow-up.",
+);
+
+assert.match(
+  source,
+  /<div class="card-labels"><span class="card-label responsible">\$\{escapeHtml\(project\.responsible_name\)\}<\/span><\/div>/,
+  "O responsavel do projeto deve usar a mesma etiqueta dos cards da Base de clientes.",
+);
+assert.match(
+  source,
+  /<p class="followup-chip">Follow-up: \$\{humanDate\(due\.due_at\)\}<\/p>/,
+  "O follow-up do projeto deve usar o mesmo chip dos cards da Base de clientes.",
 );
 
 console.log("project follow-ups: ok");

@@ -20,6 +20,11 @@ Kanban.
 - busca global;
 - cadastro e exclusão de leads;
 - etiquetas, responsável e histórico por empresa;
+- filtro compacto por qualquer responsável, ao lado da busca, na Base de
+  clientes e em Projetos;
+- página ativa preservada ao recarregar o navegador;
+- cards abertos em Follow-ups, Agendamentos e Base completa permanecem na
+  própria seção;
 - alerta de tempo parado;
 - datas no padrão `DD/MM/AAAA HH:mm`;
 - dashboard de operação e conversão;
@@ -77,8 +82,7 @@ Kanban.
 
 ## Banco remoto
 
-As migrations até
-`20260731000100_follow_up_recipient_follows_card_responsible.sql` foram aplicadas.
+As migrations até `20260731000200_project_collaboration.sql` foram aplicadas.
 
 Principais extensões recentes:
 
@@ -94,6 +98,9 @@ Principais extensões recentes:
 - follow-ups unificados para leads e projetos.
 - responsável estruturado também em projetos;
 - destinatário de follow-up derivado do responsável atual do card.
+- `commercial_project_members` e `commercial_project_links`;
+- RPC atômica `save_project_collaboration(...)`;
+- garantia de que o responsável principal sempre é membro do projeto.
 
 ## Testes atuais
 
@@ -107,6 +114,9 @@ Os contratos locais cobrem:
 - rolagem do Banco de leads;
 - sidebar fixa e responsiva;
 - follow-ups de projetos e compatibilidade da fila de e-mail.
+- filtros pessoais no CRM e no pipeline de projetos;
+- persistência de navegação e abertura contextual dos detalhes;
+- invariantes de responsável, membros e links de projeto no banco remoto.
 
 ## Pendências para produção
 

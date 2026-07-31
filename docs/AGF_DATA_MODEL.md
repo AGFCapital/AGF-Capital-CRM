@@ -20,6 +20,8 @@ credencial de servidor armazenada no cofre da própria instância.
 | `message_drafts` | Rascunho atual e versões anteriores. |
 | `lead_follow_ups` | Tarefas de leads ou projetos, com data, responsável e estado. |
 | `commercial_projects` | Pipeline, valor e próxima ação de projetos. |
+| `commercial_project_members` | Participantes do projeto, incluindo obrigatoriamente o responsável principal. |
+| `commercial_project_links` | Links HTTPS para Drive, documentos, planilhas ou outros materiais do projeto. |
 
 ## Banco de leads
 
@@ -101,6 +103,25 @@ Ao trocar `leads.responsible_id` ou `commercial_projects.responsible_id`, o
 banco propaga o novo responsável aos follow-ups abertos e às entregas ainda
 não enviadas. Uma entrega já enviada permanece histórica e não é reescrita.
 
+## Colaboração em projetos
+
+`commercial_projects.responsible_id` continua sendo a única pessoa responsável
+pelo próximo movimento e pelo recebimento dos follow-ups. Os registros de
+`commercial_project_members` representam participantes adicionais e não
+alteram automaticamente o destinatário das tarefas.
+
+`commercial_project_links` guarda um título e uma URL HTTPS por documento. O
+conteúdo do Drive não é copiado para o CRM e as permissões continuam sendo
+controladas no serviço de origem.
+
+A RPC `save_project_collaboration(...)` atualiza responsável, membros e links
+em uma única transação. Ela valida perfis, rejeita URLs não HTTPS e inclui o
+responsável entre os membros mesmo quando ele não foi selecionado manualmente.
+
+Essas relações permanecem no schema para compatibilidade, mas a interface
+operacional voltou ao modelo simples com um único responsável visível. Membros
+adicionais e links não são editados no card de projeto atual.
+
 ## Configurações
 
 `app_settings` armazena configurações compartilhadas:
@@ -139,4 +160,6 @@ Preferências individuais ficam em `profiles`, não em `app_settings`.
 20260729000600  bases nomeadas
 20260729000700  nome da base inicial
 20260729000800  follow-ups em projetos
+20260731000100  destinatário acompanha o responsável do card
+20260731000200  membros e links de projetos
 ```

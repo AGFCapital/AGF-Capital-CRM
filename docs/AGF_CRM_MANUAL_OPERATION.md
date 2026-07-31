@@ -8,6 +8,14 @@ Todos os operadores acessam a mesma base. Use a busca no topo para localizar
 empresa, contato, cargo ou LinkedIn. O sino mostra primeiro as tarefas do
 usuário atual e permite alternar para a equipe.
 
+Na **Base de clientes** e em **Projetos**, use o seletor compacto ao lado da
+busca para mostrar `Todos` ou somente os cards de um responsável específico.
+O filtro não altera os dados compartilhados.
+
+Ao recarregar o navegador, o CRM retorna à seção em que você estava. Abrir um
+card por **Follow-ups**, **Agendamentos** ou **Base completa** mostra o detalhe
+sobre a própria tela, sem redirecionar para a Base de clientes.
+
 ## 2. Importar uma base
 
 1. Abra **Banco de leads**.
@@ -118,6 +126,9 @@ Pos-call -> Proposta -> Negociação -> Projeto -> Ganho / Perdido
 
 O valor pode ser editado no card expandido. O dashboard soma os valores por
 etapa.
+
+O responsável selecionado é a pessoa que recebe os follow-ups e conduz a
+próxima ação do projeto.
 
 No mesmo detalhe do projeto, use **Adicionar** em **Follow-ups** para criar um
 lembrete com data, horário e próxima ação. O card compacto exibe o próximo

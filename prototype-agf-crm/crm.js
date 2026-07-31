@@ -2,6 +2,11 @@ import { legacySheetDrafts } from "./legacy-sheet-drafts.js";
 import { decodeApolloCsv, prepareApolloImport } from "./apollo-import.js";
 import { chooseLatestActiveBooking } from "./calendar-bookings.js";
 import {
+  openCrmEntityDetails,
+  readActiveCrmPage,
+  writeActiveCrmPage,
+} from "./crm-navigation.js";
+import {
   dimensionConversion,
   formatBrlCurrency,
   formatCrmDate,
@@ -96,9 +101,10 @@ const stageDropTargets = {
 const state = {
   leads: [], projects: [], profiles: [], settings: { bookingUrl: "", timezone: "America/Sao_Paulo", callDuration: 30, slotInterval: 15 },
   leadPool: { available: 0, released: 0, duplicates: 0, discarded: 0, default_release_quantity: 20, batches: [], recent_batches: [] },
-  selectedId: null, selectedProjectId: null, page: "operation", draggedId: null, draggedProjectId: null,
+  selectedId: null, selectedProjectId: null, page: readActiveCrmPage(), draggedId: null, draggedProjectId: null,
   settingsOpen: false, projectModal: null, manualLeadModal: false, followUpTarget: null, importModal: null, followUpNotificationTimer: null,
   searchQuery: "", notificationCenterOpen: false, notificationView: "mine",
+  leadOwnerFilter: "all", projectOwnerFilter: "all",
   remoteRefreshTimer: null, remoteRefreshInFlight: false,
   remote: { config: null, session: readSession(), enabled: false, loading: true, error: null },
 };
@@ -106,6 +112,7 @@ const root = document.querySelector("#app");
 
 function readSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
 function writeSession(session) { state.remote.session = session; if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session)); else localStorage.removeItem(SESSION_KEY); }
+function setActivePage(page) { state.page = writeActiveCrmPage(page); }
 function escapeHtml(value = "") { return String(value).replace(/[&<>\"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[char])); }
 function leadById(id) { return state.leads.find((lead) => lead.id === id); }
 function projectById(id) { return state.projects.find((project) => project.id === id); }
@@ -204,6 +211,8 @@ function mapProject(row) {
     ...row,
     currentStage: row.current_stage,
     responsibleId: row.responsible_id || null,
+    memberIds: (row.project_members || []).map((member) => member.profile_id),
+    links: (row.project_links || []).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)),
     followUps: mapFollowUps(row.lead_follow_ups),
   };
 }
@@ -258,7 +267,7 @@ async function loadRemoteData() {
   const leadQuery = "/rest/v1/leads?select=id,current_stage,total_score,company_size_score,urgency_score,financial_moment_score,decision_maker_score,real_economy_bonus,source,import_origin,company_overview,contact_context,organization_label,responsible_id,updated_at,stage_entered_at,company:companies(id,name,industry,headquarters_city,headquarters_state,real_economy),contact:contacts(full_name,title,linkedin_url,profile_gate_passed,profile_gate_reason,connection_count,location_country),lead_signals(summary,family,source_url,source_name,published_at,occurred_at,verified_at,verification_method),message_drafts(id,body,is_current,updated_at),calendar_bookings(provider_event_id,provider_created_at,starts_at,status,meeting_url,match_status,created_at,updated_at),lead_activities(summary,created_at),lead_follow_ups(id,due_at,note,status,completed_at,assigned_to)&order=created_at.desc";
   const [leadRows, projectRows, settingRows, leadPool, profileRows] = await Promise.all([
     supabaseRequest(leadQuery),
-    supabaseRequest("/rest/v1/commercial_projects?select=*,lead_follow_ups(id,due_at,note,status,completed_at,assigned_to)&order=updated_at.desc"),
+    supabaseRequest("/rest/v1/commercial_projects?select=*,project_members:commercial_project_members(profile_id),project_links:commercial_project_links(id,title,url,created_at,created_by),lead_follow_ups(id,due_at,note,status,completed_at,assigned_to)&order=updated_at.desc"),
     supabaseRequest("/rest/v1/app_settings?select=setting_key,value"),
     supabaseRequest("/rest/v1/rpc/lead_pool_dashboard", { method: "POST", body: "{}" }),
     supabaseRequest("/rest/v1/profiles?select=id,full_name,role,notification_email,follow_up_email_enabled&order=full_name.asc"),
@@ -277,8 +286,32 @@ function operatorName() {
 function responsibleProfile(id) {
   return state.profiles.find((profile) => profile.id === id) || null;
 }
+function profileLabel(profile) {
+  return profile?.full_name || profile?.notification_email || "Operador AGF";
+}
+function profileInitials(profile) {
+  return profileLabel(profile).split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+}
 function responsibleOptions(selectedId) {
-  return state.profiles.map((profile) => `<option value="${profile.id}" ${selectedId === profile.id ? "selected" : ""}>${escapeHtml(profile.full_name || profile.notification_email || "Operador")}</option>`).join("");
+  return state.profiles.map((profile) => `<option value="${profile.id}" ${selectedId === profile.id ? "selected" : ""}>${escapeHtml(profileLabel(profile))}</option>`).join("");
+}
+function ownerFilter(scope, value) {
+  return `<label class="utility-owner-filter"><span>Responsavel</span><select data-owner-filter data-owner-scope="${scope}" aria-label="Filtrar por responsavel"><option value="all" ${value === "all" ? "selected" : ""}>Todos</option>${state.profiles.map((profile) => `<option value="${profile.id}" ${value === profile.id ? "selected" : ""}>${escapeHtml(profileLabel(profile))}</option>`).join("")}</select></label>`;
+}
+function projectMemberInputs(memberIds = [], responsibleId = null) {
+  return [...new Set([...memberIds, responsibleId].filter(Boolean))]
+    .map((id) => `<input type="hidden" name="memberIds" value="${escapeHtml(id)}">`)
+    .join("");
+}
+function projectLinkInputs(links = []) {
+  return links.map((link) => `<input type="hidden" name="linkTitle" value="${escapeHtml(link.title || "")}"><input type="hidden" name="linkUrl" value="${escapeHtml(link.url || "")}">`).join("");
+}
+function projectLinkRow(link = {}) {
+  return `<div class="project-link-row"><label><span>Nome do documento</span><input name="linkTitle" value="${escapeHtml(link.title || "")}" placeholder="Ex.: Pasta do projeto"></label><label><span>Link HTTPS</span><input name="linkUrl" type="url" value="${escapeHtml(link.url || "")}" placeholder="https://drive.google.com/..."></label>${link.url ? `<a class="project-link-open" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">Abrir ↗</a>` : ""}<button type="button" data-action="remove-project-link" aria-label="Remover link">Remover</button></div>`;
+}
+function projectLinksEditor(links = []) {
+  const rows = links.length ? links.map(projectLinkRow).join("") : projectLinkRow();
+  return `<section class="project-links-editor"><div class="section-heading"><div><h3>Documentos e links</h3><p>Anexe pastas do Drive, propostas, planilhas ou outros materiais do projeto.</p></div><button type="button" class="text-link" data-action="add-project-link">Adicionar link</button></div><div class="project-link-rows">${rows}</div></section>`;
 }
 function loginPage() { return `<main class="login-page"><section class="login-intro"><div class="login-brand"><div class="brand-mark">A</div><div><strong>AGF</strong><span>Capital</span></div></div><div class="login-copy"><p class="eyebrow">OPERACAO COMERCIAL</p><h1>Uma base. Uma visao clara do proximo movimento.</h1><p>O CRM organiza os leads ja cadastrados, as conversas e os projetos em uma operacao compartilhada.</p></div><div class="login-signal-card"><div><span class="signal-dot"></span><small>SISTEMA PRONTO</small></div><strong>Operacao manual assistida</strong><p>O CRM nao extrai nem envia pelo LinkedIn. Ele deixa cada acao humana pronta, rastreavel e organizada.</p><div class="signal-steps"><span>Base</span><i></i><span>Conversa</span><i></i><span>Call</span><i></i><span>Projeto</span></div></div><p class="login-footnote">Base compartilhada: todos veem os mesmos leads, follow-ups e projetos.</p></section><section class="login-panel"><div class="login-card"><p class="eyebrow">ACESSO RESTRITO</p><h2>Entre na operacao.</h2><p>Use o e-mail e a senha cadastrados para sua equipe.</p><form id="login-form"><label>E-mail<input type="email" name="email" autocomplete="email" placeholder="nome@agfcapital.com.br" required></label><label>Senha<input type="password" name="password" autocomplete="current-password" placeholder="Sua senha" required></label><button class="button primary" type="submit">Entrar no CRM <span>→</span></button></form><div class="login-security"><b>Ambiente protegido</b><span>O acesso controla permissao; nao cria bases ou pipelines separados.</span></div></div></section></main>`; }
 function notificationItems() {
@@ -288,7 +321,10 @@ function notificationItems() {
 }
 function workspaceUtility() {
   const alerts = notificationItems();
-  return `<div class="workspace-utility"><div class="global-search"><span aria-hidden="true">⌕</span><input id="global-lead-search" type="search" value="${escapeHtml(state.searchQuery)}" placeholder="Buscar empresa, lead, cargo ou LinkedIn" autocomplete="off" aria-label="Buscar leads"><div id="global-search-results" class="global-search-results"></div></div><button class="notification-bell ${alerts.length ? "has-alerts" : ""}" data-action="toggle-notifications" aria-label="Notificacoes"><span aria-hidden="true">♢</span><b data-notification-count ${alerts.length ? "" : "hidden"}>${alerts.length}</b></button></div>`;
+  const ownerScope = state.page === "operation" ? "leads" : state.page === "projects" ? "projects" : null;
+  const ownerValue = ownerScope === "leads" ? state.leadOwnerFilter : state.projectOwnerFilter;
+  const filter = ownerScope ? ownerFilter(ownerScope, ownerValue) : "";
+  return `<div class="workspace-utility"><div class="global-search"><span aria-hidden="true">⌕</span><input id="global-lead-search" type="search" value="${escapeHtml(state.searchQuery)}" placeholder="Buscar empresa, lead, cargo ou LinkedIn" autocomplete="off" aria-label="Buscar leads"><div id="global-search-results" class="global-search-results"></div></div>${filter}<button class="notification-bell ${alerts.length ? "has-alerts" : ""}" data-action="toggle-notifications" aria-label="Notificacoes"><span aria-hidden="true">♢</span><b data-notification-count ${alerts.length ? "" : "hidden"}>${alerts.length}</b></button></div>`;
 }
 function followUpTargetAttributes(item, prefix = "notification") {
   return item.targetType === "project"
@@ -384,7 +420,7 @@ function cardActions(lead) {
 }
 function card(lead) { const due = lead.followUps.find((item) => item.status === "open"); const actions = cardActions(lead); const age = lead.stage === "descartado" ? null : leadAgeState(lead.stageEnteredAt); const labels = [lead.organizationLabel ? `<span class="card-label organization">${escapeHtml(lead.organizationLabel)}</span>` : "", lead.responsibleName ? `<span class="card-label responsible">${escapeHtml(lead.responsibleName)}</span>` : ""].join(""); return `<article class="lead-card ${age ? `aged ${age.tone}` : ""}" draggable="true" data-lead="${lead.id}" tabindex="0"><div class="card-top"><span class="badge ${sourceClass(lead.source)}">${lead.source}</span>${age ? `<span class="age-alert ${age.tone}" title="Entrou nesta etapa em ${humanDate(lead.stageEnteredAt)}">${age.days}d</span>` : ""}</div><h3>${escapeHtml(lead.company)}</h3><p class="contact">${escapeHtml(lead.contact)}<span>${escapeHtml(lead.role)}</span></p>${labels ? `<div class="card-labels">${labels}</div>` : ""}${age ? `<p class="age-copy">${age.label}</p>` : ""}${lead.meeting ? `<p class="meeting">${lead.meeting}</p>` : ""}${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}${actions ? `<div class="card-actions">${actions}</div>` : ""}<footer><span class="card-stage">${stageNames[lead.stage]}</span>${lead.linkedinUrl ? `<button class="card-linkedin" data-action="open-linkedin" data-lead="${lead.id}">LinkedIn ↗</button>` : ""}</footer></article>`; }
 function emptyStage(column) { const messages = { base: "Leads cadastrados aguardam a proxima acao.", invite: "Abra o perfil, envie o convite e registre o envio.", pending: "Aguarde o aceite ou atualize manualmente.", accepted: "A mensagem longa esta pronta para copiar e editar.", message: "Registre quando houver resposta.", conversation: "Leads com conversa ativa.", scheduling: "Envie manualmente o link da agenda.", booked: "Reservas do Calendar aparecem aqui.", "create-project": "Arraste para ca uma call com interesse. O card vira um projeto em Pos-call.", discarded: "Leads descartados com motivo." }; return `<div class="empty-state">${messages[column] || "Sem cards nesta etapa."}</div>`; }
-function operationPage() { const board = boardColumns.map((column) => { const items = state.leads.filter((lead) => column.stages.includes(lead.stage)); return `<section class="kanban-column" data-column="${column.key}" data-target="${stageDropTargets[column.key] || ""}"><header><h2>${column.label}</h2><span>${items.length}</span></header><div class="cards">${items.map(card).join("") || emptyStage(column.key)}</div></section>`; }).join(""); return appShell(`${header("OPERAÇÃO COMERCIAL", "Base de clientes", "Arraste o card para avançar ou voltar etapas; abra-o para revisar o contexto.", `<button class="button primary" data-action="new-manual-lead">Novo lead</button><button class="button secondary" data-action="import-csv">Banco de leads <span class="button-count">${state.leadPool.available || 0}</span></button><button class="button secondary" data-action="settings">Configurar agenda</button>`) }${metrics()}<div class="board-caption"><span>O Kanban é horizontal; cada coluna mantém sua própria rolagem de cards.</span><div><span class="status-dot"></span> LinkedIn operado manualmente</div></div><div class="kanban-scroll"><div class="kanban">${board}</div></div>${drawOverlays()}`); }
+function operationPage() { const visibleLeads = state.leadOwnerFilter === "all" ? state.leads : state.leads.filter((lead) => lead.responsibleId === state.leadOwnerFilter); const board = boardColumns.map((column) => { const items = visibleLeads.filter((lead) => column.stages.includes(lead.stage)); return `<section class="kanban-column" data-column="${column.key}" data-target="${stageDropTargets[column.key] || ""}"><header><h2>${column.label}</h2><span>${items.length}</span></header><div class="cards">${items.map(card).join("") || emptyStage(column.key)}</div></section>`; }).join(""); return appShell(`${header("OPERAÇÃO COMERCIAL", "Base de clientes", "Arraste o card para avançar ou voltar etapas; abra-o para revisar o contexto.", `<button class="button primary" data-action="new-manual-lead">Novo lead</button><button class="button secondary" data-action="import-csv">Banco de leads <span class="button-count">${state.leadPool.available || 0}</span></button><button class="button secondary" data-action="settings">Configurar agenda</button>`) }${metrics()}<div class="board-caption"><span>O Kanban é horizontal; cada coluna mantém sua própria rolagem de cards.</span><div><span class="status-dot"></span> LinkedIn operado manualmente</div></div><div class="kanban-scroll"><div class="kanban">${board}</div></div>${drawOverlays()}`); }
 function stageAction(lead) {
   if (["revisao_manual", "qualificado"].includes(lead.stage)) return `<button class="button primary" data-action="move-to-invite" data-lead="${lead.id}">Mover para Enviar convite</button>`;
   if (lead.stage === "aprovado") return `<div class="manual-action"><p>Copie a nota, abra o perfil, envie o convite manualmente e volte para registrar.</p><button class="button secondary" data-action="copy-invite-note" data-lead="${lead.id}">Copiar nota</button><button class="button secondary" data-action="open-linkedin" data-lead="${lead.id}">Abrir perfil</button><button class="button primary" data-action="invite-sent" data-lead="${lead.id}">Enviei o convite</button></div>`;
@@ -403,11 +439,11 @@ function settingsModal() {
 }
 function agendaPage() { const bookings = state.leads.filter((lead) => lead.stage === "call_marcada"); return appShell(`${header("AGENDA", "Calls confirmadas", "Quando a agenda receber uma reserva, o workflow do Calendar atualizara este card automaticamente.", `<button class="button secondary" data-action="settings">Configurar link da agenda</button>`)}<section class="agenda-list">${bookings.length ? bookings.map((lead) => `<button class="agenda-row" data-lead="${lead.id}"><span class="agenda-time">${lead.meeting || "Horario pendente"}</span><div><strong>${escapeHtml(lead.company)}</strong><small>${escapeHtml(lead.contact)} | ${escapeHtml(lead.role)}</small></div><span>Ver card</span></button>`).join("") : `<div class="empty-page">Nenhuma call marcada.</div>`}</section>${drawOverlays()}`); }
 function followUpsPage() { const items = allFollowUps().filter((item) => item.status === "open").sort((a, b) => new Date(a.due_at) - new Date(b.due_at)); return appShell(`${header("FOLLOW-UPS", "Proximas acoes", "Todos veem a fila da equipe; cada lembrete e enviado somente ao responsavel atual do card.")}<section class="agenda-list">${items.length ? items.map((item) => `<button class="agenda-row" ${item.targetType === "project" ? `data-followup-project="${item.targetId}"` : `data-followup-lead="${item.targetId}"`}><span class="agenda-time">${humanDate(item.due_at)}</span><div><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.note)} · ${escapeHtml(item.assignedName)} · ${item.targetType === "project" ? "Projeto" : "Lead"}</small></div><span>Ver card</span></button>`).join("") : `<div class="empty-page">Nenhum follow-up aberto.</div>`}</section>${drawOverlays()}`); }
-function projectCard(project) { const due = project.followUps.find((item) => item.status === "open"); return `<article class="project-card" draggable="true" data-project="${project.id}" tabindex="0"><span class="project-stage">${projectStageNames[project.currentStage]}</span><h3>${escapeHtml(project.name)}</h3><p class="project-company">${escapeHtml(project.company_name)}</p>${project.estimated_value != null ? `<strong class="project-value">${formatBrlCurrency(project.estimated_value)}</strong>` : ""}<div class="project-owner"><span>Responsavel</span><strong>${escapeHtml(project.responsible_name)}</strong></div>${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}<footer><div><small>Proxima acao</small><strong>${project.next_action_at ? `${humanDate(project.next_action_at)} · ${escapeHtml(project.next_action || "Acao pendente")}` : "Nao definida"}</strong></div><span>Abrir</span></footer></article>`; }
-function projectsPage() { const board = projectStages.map(([key, label]) => { const items = state.projects.filter((project) => project.currentStage === key); return `<section class="project-column" data-project-stage="${key}"><header><h2>${label}</h2><span>${items.length}</span></header><div class="project-cards">${items.map(projectCard).join("") || `<div class="empty-state">Sem projetos nesta etapa.</div>`}</div></section>`; }).join(""); return appShell(`${header("PIPELINE COMERCIAL", "Projetos sob gestao", "Crie projetos manualmente ou a partir de uma call marcada.", `<button class="button primary" data-action="new-project">Novo projeto</button>`)}<div class="project-scroll"><div class="project-kanban">${board}</div></div>${drawOverlays()}`); }
-function projectModal(lead) { const company = lead?.company || ""; const selectedResponsible = lead?.responsibleId || state.remote.session?.user?.id || ""; return `<div class="backdrop" data-action="close-project-modal"></div><section class="project-modal" role="dialog" aria-label="Novo projeto"><header><div><p class="eyebrow">PIPELINE COMERCIAL</p><h2>${lead ? "Criar projeto da call" : "Novo projeto"}</h2><p>Projetos podem existir sem terem passado pela base de leads.</p></div><button data-action="close-project-modal">×</button></header><form id="project-form"><input type="hidden" name="leadId" value="${lead?.id || ""}"><input type="hidden" name="companyId" value="${lead?.companyId || ""}"><div class="form-grid"><label>Nome do projeto<input name="name" required placeholder="Ex.: Automacao financeira"></label><label>Empresa<input name="companyName" required value="${escapeHtml(company)}"></label><label>Responsavel<select name="responsibleId" required>${responsibleOptions(selectedResponsible)}</select></label><label>Etapa<select name="stage">${projectStages.map(([key, label]) => `<option value="${key}">${label}</option>`).join("")}</select></label><label>Proxima acao<input name="nextAction" placeholder="Ex.: enviar proposta"></label><label>Data da proxima acao<input name="nextActionAt" type="datetime-local"></label><label>Valor estimado (opcional)<input name="estimatedValue" type="number" min="0" step="0.01" placeholder="0,00"></label></div><label>Descricao<textarea name="description" required placeholder="Escopo e contexto do projeto"></textarea></label><label>Observacoes<textarea name="notes" placeholder="Observacoes internas"></textarea></label><footer><button type="button" class="button secondary" data-action="close-project-modal">Cancelar</button><button type="submit" class="button primary">Criar projeto</button></footer></form></section>`; }
+function projectCard(project) { const due = project.followUps.find((item) => item.status === "open"); const responsibleLabel = project.responsible_name ? `<div class="card-labels"><span class="card-label responsible">${escapeHtml(project.responsible_name)}</span></div>` : ""; return `<article class="project-card" draggable="true" data-project="${project.id}" tabindex="0"><span class="project-stage">${projectStageNames[project.currentStage]}</span><h3>${escapeHtml(project.name)}</h3><p class="project-company">${escapeHtml(project.company_name)}</p>${project.estimated_value != null ? `<strong class="project-value">${formatBrlCurrency(project.estimated_value)}</strong>` : ""}${responsibleLabel}${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}<footer><div><small>Proxima acao</small><strong>${project.next_action_at ? `${humanDate(project.next_action_at)} · ${escapeHtml(project.next_action || "Acao pendente")}` : "Nao definida"}</strong></div><span>Abrir</span></footer></article>`; }
+function projectsPage() { const visibleProjects = state.projectOwnerFilter === "all" ? state.projects : state.projects.filter((project) => project.responsibleId === state.projectOwnerFilter); const board = projectStages.map(([key, label]) => { const items = visibleProjects.filter((project) => project.currentStage === key); return `<section class="project-column" data-project-stage="${key}"><header><h2>${label}</h2><span>${items.length}</span></header><div class="project-cards">${items.map(projectCard).join("") || `<div class="empty-state">Sem projetos nesta etapa.</div>`}</div></section>`; }).join(""); return appShell(`${header("PIPELINE COMERCIAL", "Projetos sob gestao", "Acompanhe as oportunidades, proximas acoes e valores do pipeline.", `<button class="button primary" data-action="new-project">Novo projeto</button>`)}<div class="project-scroll"><div class="project-kanban">${board}</div></div>${drawOverlays()}`); }
+function projectModal(lead) { const company = lead?.company || ""; const selectedResponsible = lead?.responsibleId || state.remote.session?.user?.id || state.profiles[0]?.id || ""; return `<div class="backdrop" data-action="close-project-modal"></div><section class="project-modal" role="dialog" aria-label="Novo projeto"><header><div><p class="eyebrow">PIPELINE COMERCIAL</p><h2>${lead ? "Criar projeto da call" : "Novo projeto"}</h2><p>Projetos podem existir sem terem passado pela base de leads.</p></div><button data-action="close-project-modal">×</button></header><form id="project-form"><input type="hidden" name="leadId" value="${lead?.id || ""}"><input type="hidden" name="companyId" value="${lead?.companyId || ""}">${projectMemberInputs([selectedResponsible], selectedResponsible)}<div class="form-grid"><label>Nome do projeto<input name="name" required placeholder="Ex.: Automacao financeira"></label><label>Empresa<input name="companyName" required value="${escapeHtml(company)}"></label><label>Responsavel<select name="responsibleId" data-project-responsible required>${responsibleOptions(selectedResponsible)}</select></label><label>Etapa<select name="stage">${projectStages.map(([key, label]) => `<option value="${key}">${label}</option>`).join("")}</select></label><label>Proxima acao<input name="nextAction" placeholder="Ex.: enviar proposta"></label><label>Data da proxima acao<input name="nextActionAt" type="datetime-local"></label><label>Valor estimado (opcional)<input name="estimatedValue" type="number" min="0" step="0.01" placeholder="0,00"></label></div><label>Descricao<textarea name="description" required placeholder="Escopo e contexto do projeto"></textarea></label><label>Observacoes<textarea name="notes" placeholder="Observacoes internas"></textarea></label><footer><button type="button" class="button secondary" data-action="close-project-modal">Cancelar</button><button type="submit" class="button primary">Criar projeto</button></footer></form></section>`; }
 function datetimeLocalValue(value) { return value ? new Date(value).toISOString().slice(0, 16) : ""; }
-function projectDrawer(project) { if (!project) return ""; const openFollowUps = project.followUps.filter((item) => item.status === "open"); return `<div class="backdrop" data-action="close-project-detail"></div><aside class="lead-drawer project-drawer" role="dialog" aria-label="Editar projeto ${escapeHtml(project.name)}"><header><div><p class="eyebrow">${projectStageNames[project.currentStage]}</p><h2>${escapeHtml(project.name)}</h2><p class="drawer-contact">${escapeHtml(project.company_name)}</p></div><button data-action="close-project-detail" aria-label="Fechar">×</button></header><form id="project-edit-form"><input type="hidden" name="projectId" value="${project.id}"><div class="form-grid"><label>Nome do projeto<input name="name" required value="${escapeHtml(project.name)}"></label><label>Empresa<input name="companyName" required value="${escapeHtml(project.company_name)}"></label><label>Responsavel<select name="responsibleId" required>${responsibleOptions(project.responsibleId)}</select></label><label>Etapa<select name="stage">${projectStages.map(([key, label]) => `<option value="${key}" ${project.currentStage === key ? "selected" : ""}>${label}</option>`).join("")}</select></label><label>Proxima acao<input name="nextAction" value="${escapeHtml(project.next_action || "")}" placeholder="Ex.: enviar proposta"></label><label>Data da proxima acao<input name="nextActionAt" type="datetime-local" value="${datetimeLocalValue(project.next_action_at)}"></label><label>Valor estimado (opcional)<input name="estimatedValue" type="number" min="0" step="0.01" value="${project.estimated_value ?? ""}"></label></div><section><h3>Descricao</h3><textarea name="description" required>${escapeHtml(project.description || "")}</textarea></section><section><h3>Observacoes internas</h3><textarea name="notes">${escapeHtml(project.notes || "")}</textarea></section><section><div class="section-heading"><h3>Follow-ups</h3><button type="button" class="text-link" data-action="new-followup" data-project="${project.id}">Adicionar</button></div>${openFollowUps.length ? `<ul class="followup-list">${openFollowUps.map((item) => `<li><span><b>${humanDate(item.due_at)}</b>${escapeHtml(item.note)}</span><button type="button" data-action="complete-followup" data-followup="${item.id}">Concluir</button></li>`).join("")}</ul>` : `<p class="muted-copy">Nenhum lembrete aberto.</p>`}</section><footer><button type="button" class="button danger" data-action="delete-project" data-project-id="${project.id}">Apagar projeto</button><button type="button" class="button secondary" data-action="close-project-detail">Cancelar</button><button type="submit" class="button primary">Salvar alteracoes</button></footer></form></aside>`; }
+function projectDrawer(project) { if (!project) return ""; const openFollowUps = project.followUps.filter((item) => item.status === "open"); return `<div class="backdrop" data-action="close-project-detail"></div><aside class="lead-drawer project-drawer" role="dialog" aria-label="Editar projeto ${escapeHtml(project.name)}"><header><div><p class="eyebrow">${projectStageNames[project.currentStage]}</p><h2>${escapeHtml(project.name)}</h2><p class="drawer-contact">${escapeHtml(project.company_name)}</p></div><button data-action="close-project-detail" aria-label="Fechar">×</button></header><form id="project-edit-form"><input type="hidden" name="projectId" value="${project.id}">${projectMemberInputs(project.memberIds, project.responsibleId)}${projectLinkInputs(project.links)}<div class="form-grid"><label>Nome do projeto<input name="name" required value="${escapeHtml(project.name)}"></label><label>Empresa<input name="companyName" required value="${escapeHtml(project.company_name)}"></label><label>Responsavel<select name="responsibleId" data-project-responsible required>${responsibleOptions(project.responsibleId)}</select></label><label>Etapa<select name="stage">${projectStages.map(([key, label]) => `<option value="${key}" ${project.currentStage === key ? "selected" : ""}>${label}</option>`).join("")}</select></label><label>Proxima acao<input name="nextAction" value="${escapeHtml(project.next_action || "")}" placeholder="Ex.: enviar proposta"></label><label>Data da proxima acao<input name="nextActionAt" type="datetime-local" value="${datetimeLocalValue(project.next_action_at)}"></label><label>Valor estimado (opcional)<input name="estimatedValue" type="number" min="0" step="0.01" value="${project.estimated_value ?? ""}"></label></div><section><h3>Descricao</h3><textarea name="description" required>${escapeHtml(project.description || "")}</textarea></section><section><h3>Observacoes internas</h3><textarea name="notes">${escapeHtml(project.notes || "")}</textarea></section><section><div class="section-heading"><h3>Follow-ups</h3><button type="button" class="text-link" data-action="new-followup" data-project="${project.id}">Adicionar</button></div>${openFollowUps.length ? `<ul class="followup-list">${openFollowUps.map((item) => `<li><span><b>${humanDate(item.due_at)}</b>${escapeHtml(item.note)}</span><button type="button" data-action="complete-followup" data-followup="${item.id}">Concluir</button></li>`).join("")}</ul>` : `<p class="muted-copy">Nenhum lembrete aberto.</p>`}</section><footer><button type="button" class="button danger" data-action="delete-project" data-project-id="${project.id}">Apagar projeto</button><button type="button" class="button secondary" data-action="close-project-detail">Cancelar</button><button type="submit" class="button primary">Salvar alteracoes</button></footer></form></aside>`; }
 function importProblemList(items = []) {
   if (!items.length) return "";
   const preview = items.slice(0, 3);
@@ -608,8 +644,80 @@ async function deleteLead(lead) {
     toast(error.message || "Nao foi possivel apagar o card.");
   }
 }
-async function createProject(values) { const stage = values.stage; const closed = ["ganho", "perdido"].includes(stage) ? new Date().toISOString() : null; const responsible = responsibleProfile(values.responsibleId); if (!responsible) { toast("Selecione um responsavel valido para o projeto."); return; } try { await supabaseRequest("/rest/v1/commercial_projects", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ lead_id: values.leadId || null, company_id: values.companyId || null, name: values.name, company_name: values.companyName, responsible_id: responsible.id, responsible_name: responsible.full_name || responsible.notification_email || "Operador AGF", current_stage: stage, description: values.description, next_action: values.nextAction || null, next_action_at: values.nextActionAt ? new Date(values.nextActionAt).toISOString() : null, estimated_value: parseBrlCurrency(values.estimatedValue), notes: values.notes || null, closed_at: closed, created_by: state.remote.session.user.id }) }); if (values.leadId) await recordActivity(values.leadId, "commercial_project_created", "Projeto comercial criado a partir deste lead."); state.projectModal = null; state.page = "projects"; await reloadAndRender("Projeto criado no pipeline comercial."); } catch (error) { toast(error.message || "Nao foi possivel criar o projeto."); } }
-async function saveProjectEdits(values) { const stage = values.stage; const responsible = responsibleProfile(values.responsibleId); if (!responsible) { toast("Selecione um responsavel valido para o projeto."); return; } try { await supabaseRequest(`/rest/v1/commercial_projects?id=eq.${encodeURIComponent(values.projectId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ name: values.name, company_name: values.companyName, responsible_id: responsible.id, responsible_name: responsible.full_name || responsible.notification_email || "Operador AGF", current_stage: stage, description: values.description, next_action: values.nextAction || null, next_action_at: values.nextActionAt ? new Date(values.nextActionAt).toISOString() : null, estimated_value: parseBrlCurrency(values.estimatedValue), notes: values.notes || null, closed_at: ["ganho", "perdido"].includes(stage) ? new Date().toISOString() : null }) }); state.selectedProjectId = null; await reloadAndRender("Projeto atualizado."); } catch (error) { toast(error.message || "Nao foi possivel salvar o projeto."); } }
+function projectFormValues(form) {
+  const data = new FormData(form);
+  return {
+    ...Object.fromEntries(data),
+    memberIds: data.getAll("memberIds"),
+    linkTitles: data.getAll("linkTitle"),
+    linkUrls: data.getAll("linkUrl"),
+  };
+}
+function projectCollaborationFromValues(values) {
+  const links = [];
+  const titles = values.linkTitles || [];
+  const urls = values.linkUrls || [];
+  for (let index = 0; index < Math.max(titles.length, urls.length); index += 1) {
+    const title = String(titles[index] || "").trim();
+    const url = String(urls[index] || "").trim();
+    if (!title && !url) continue;
+    if (!title || !url) throw new Error("Preencha o nome e o endereco de cada link do projeto.");
+    let parsed;
+    try { parsed = new URL(url); } catch { throw new Error(`O link "${title}" nao e valido.`); }
+    if (parsed.protocol !== "https:") throw new Error(`O link "${title}" precisa usar HTTPS.`);
+    links.push({ title, url: parsed.toString() });
+  }
+  return { memberIds: [...new Set(values.memberIds || [])], links };
+}
+async function saveProjectCollaboration(projectId, responsibleId, collaboration) {
+  return supabaseRequest("/rest/v1/rpc/save_project_collaboration", {
+    method: "POST",
+    body: JSON.stringify({
+      p_project_id: projectId,
+      p_responsible_id: responsibleId,
+      p_member_ids: collaboration.memberIds,
+      p_links: collaboration.links,
+    }),
+  });
+}
+async function createProject(values) {
+  const stage = values.stage;
+  const responsible = responsibleProfile(values.responsibleId);
+  if (!responsible) { toast("Selecione um responsavel valido para o projeto."); return; }
+  let collaboration;
+  try { collaboration = projectCollaborationFromValues(values); } catch (error) { toast(error.message); return; }
+  let createdProjectId = null;
+  try {
+    const created = await supabaseRequest("/rest/v1/commercial_projects", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({ lead_id: values.leadId || null, company_id: values.companyId || null, name: values.name, company_name: values.companyName, responsible_id: responsible.id, responsible_name: profileLabel(responsible), current_stage: stage, description: values.description, next_action: values.nextAction || null, next_action_at: values.nextActionAt ? new Date(values.nextActionAt).toISOString() : null, estimated_value: parseBrlCurrency(values.estimatedValue), notes: values.notes || null, closed_at: ["ganho", "perdido"].includes(stage) ? new Date().toISOString() : null, created_by: state.remote.session.user.id }),
+    });
+    createdProjectId = created?.[0]?.id;
+    if (!createdProjectId) throw new Error("O projeto foi criado sem identificador de retorno.");
+    await saveProjectCollaboration(createdProjectId, responsible.id, collaboration);
+    if (values.leadId) await recordActivity(values.leadId, "commercial_project_created", "Projeto comercial criado a partir deste lead.");
+    state.projectModal = null;
+    setActivePage("projects");
+    await reloadAndRender("Projeto criado no pipeline comercial.");
+  } catch (error) {
+    if (createdProjectId) await supabaseRequest(`/rest/v1/commercial_projects?id=eq.${encodeURIComponent(createdProjectId)}`, { method: "DELETE", headers: { Prefer: "return=minimal" } }).catch(() => null);
+    toast(error.message || "Nao foi possivel criar o projeto.");
+  }
+}
+async function saveProjectEdits(values) {
+  const stage = values.stage;
+  const responsible = responsibleProfile(values.responsibleId);
+  if (!responsible) { toast("Selecione um responsavel valido para o projeto."); return; }
+  let collaboration;
+  try { collaboration = projectCollaborationFromValues(values); } catch (error) { toast(error.message); return; }
+  try {
+    await supabaseRequest(`/rest/v1/commercial_projects?id=eq.${encodeURIComponent(values.projectId)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ name: values.name, company_name: values.companyName, responsible_id: responsible.id, responsible_name: profileLabel(responsible), current_stage: stage, description: values.description, next_action: values.nextAction || null, next_action_at: values.nextActionAt ? new Date(values.nextActionAt).toISOString() : null, estimated_value: parseBrlCurrency(values.estimatedValue), notes: values.notes || null, closed_at: ["ganho", "perdido"].includes(stage) ? new Date().toISOString() : null }) });
+    await saveProjectCollaboration(values.projectId, responsible.id, collaboration);
+    state.selectedProjectId = null;
+    await reloadAndRender("Projeto atualizado.");
+  } catch (error) { toast(error.message || "Nao foi possivel salvar o projeto."); }
+}
 async function importLeadPoolRecords(report, batchName) {
   const result = await supabaseRequest("/rest/v1/rpc/import_named_lead_pool", {
     method: "POST",
@@ -669,7 +777,7 @@ async function promoteLeadToProject(id) {
       body: JSON.stringify({ p_lead_id: lead.id }),
     });
     state.selectedId = null;
-    state.page = "projects";
+    setActivePage("projects");
     await reloadAndRender("Projeto criado e enviado para o pipeline comercial.");
   } catch (error) {
     toast(error.message || "Nao foi possivel criar o projeto a partir da call.");
@@ -752,7 +860,12 @@ async function saveLeadAssignment(values) {
   }
 }
 function bindEvents() {
-  document.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => { state.page = button.dataset.page; state.selectedId = null; state.notificationCenterOpen = false; render(); }));
+  document.querySelectorAll("[data-page]").forEach((button) => button.addEventListener("click", () => { setActivePage(button.dataset.page); state.selectedId = null; state.selectedProjectId = null; state.notificationCenterOpen = false; render(); }));
+  document.querySelectorAll("[data-owner-filter]").forEach((select) => select.addEventListener("change", () => {
+    if (select.dataset.ownerScope === "projects") state.projectOwnerFilter = select.value;
+    else state.leadOwnerFilter = select.value;
+    render();
+  }));
   const searchInput = document.querySelector("#global-lead-search");
   searchInput?.addEventListener("input", (event) => {
     state.searchQuery = event.currentTarget.value;
@@ -771,17 +884,11 @@ function bindEvents() {
     render();
   }));
   document.querySelectorAll("[data-notification-lead], [data-followup-lead]").forEach((button) => button.addEventListener("click", () => {
-    state.selectedProjectId = null;
-    state.selectedId = button.dataset.notificationLead || button.dataset.followupLead;
-    state.notificationCenterOpen = false;
-    state.page = "operation";
+    openCrmEntityDetails(state, "lead", button.dataset.notificationLead || button.dataset.followupLead);
     render();
   }));
   document.querySelectorAll("[data-notification-project], [data-followup-project]").forEach((button) => button.addEventListener("click", () => {
-    state.selectedId = null;
-    state.selectedProjectId = button.dataset.notificationProject || button.dataset.followupProject;
-    state.notificationCenterOpen = false;
-    state.page = "projects";
+    openCrmEntityDetails(state, "project", button.dataset.notificationProject || button.dataset.followupProject);
     render();
   }));
   document.querySelectorAll("[data-lead]").forEach((element) => element.addEventListener("click", (event) => { if (event.target.closest("[data-action]")) return; state.selectedId = element.dataset.lead; render(); }));
@@ -814,9 +921,7 @@ function bindEvents() {
   });
   document.querySelectorAll(".project-card[data-project]").forEach((node) => { node.addEventListener("click", () => { state.selectedId = null; state.selectedProjectId = node.dataset.project; render(); }); node.addEventListener("dragstart", () => { state.draggedProjectId = node.dataset.project; node.classList.add("dragging"); }); node.addEventListener("dragend", () => { state.draggedProjectId = null; node.classList.remove("dragging"); }); });
   document.querySelectorAll(".company-history [data-project]").forEach((button) => button.addEventListener("click", () => {
-    state.selectedId = null;
-    state.selectedProjectId = button.dataset.project;
-    state.page = "projects";
+    openCrmEntityDetails(state, "project", button.dataset.project);
     render();
   }));
   document.querySelectorAll(".project-column").forEach((column) => { column.addEventListener("dragover", (event) => { if (state.draggedProjectId) { event.preventDefault(); column.classList.add("drop-target"); } }); column.addEventListener("dragleave", () => column.classList.remove("drop-target")); column.addEventListener("drop", (event) => { event.preventDefault(); column.classList.remove("drop-target"); if (state.draggedProjectId) void updateProjectStage(state.draggedProjectId, column.dataset.projectStage); }); });
@@ -836,11 +941,35 @@ function bindEvents() {
   document.querySelectorAll("[data-action=import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));
   document.querySelectorAll("[data-action=close-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = null; render(); }));
   document.querySelectorAll("[data-action=reset-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));
-  document.querySelector("#login-form")?.addEventListener("submit", async (event) => { event.preventDefault(); const values = new FormData(event.currentTarget); const submit = event.currentTarget.querySelector("button[type=submit]"); submit.disabled = true; submit.textContent = "Entrando..."; try { await signIn(values.get("email"), values.get("password")); await loadRemoteData(); state.page = "operation"; render(); } catch (error) { submit.disabled = false; submit.textContent = "Entrar no CRM"; toast(error.message || "Nao foi possivel entrar."); } });
+  document.querySelector("#login-form")?.addEventListener("submit", async (event) => { event.preventDefault(); const values = new FormData(event.currentTarget); const submit = event.currentTarget.querySelector("button[type=submit]"); submit.disabled = true; submit.textContent = "Entrando..."; try { await signIn(values.get("email"), values.get("password")); await loadRemoteData(); setActivePage("operation"); render(); } catch (error) { submit.disabled = false; submit.textContent = "Entrar no CRM"; toast(error.message || "Nao foi possivel entrar."); } });
   document.querySelector("#settings-form")?.addEventListener("submit", (event) => { event.preventDefault(); void saveSettings(Object.fromEntries(new FormData(event.currentTarget))); });
   document.querySelector("#followup-form")?.addEventListener("submit", (event) => { event.preventDefault(); void createFollowUp(Object.fromEntries(new FormData(event.currentTarget))); });
-  document.querySelector("#project-form")?.addEventListener("submit", (event) => { event.preventDefault(); void createProject(Object.fromEntries(new FormData(event.currentTarget))); });
-  document.querySelector("#project-edit-form")?.addEventListener("submit", (event) => { event.preventDefault(); void saveProjectEdits(Object.fromEntries(new FormData(event.currentTarget))); });
+  document.querySelectorAll("#project-form, #project-edit-form").forEach((form) => {
+    form.addEventListener("click", (event) => {
+      const addButton = event.target.closest('[data-action="add-project-link"]');
+      if (addButton) {
+        form.querySelector(".project-link-rows")?.insertAdjacentHTML("beforeend", projectLinkRow());
+        form.querySelector(".project-link-row:last-child input")?.focus();
+        return;
+      }
+      const removeButton = event.target.closest('[data-action="remove-project-link"]');
+      if (removeButton) {
+        const rows = form.querySelectorAll(".project-link-row");
+        if (rows.length === 1) rows[0].querySelectorAll("input").forEach((input) => { input.value = ""; });
+        else removeButton.closest(".project-link-row")?.remove();
+      }
+    });
+    form.querySelector("[data-project-responsible]")?.addEventListener("change", (event) => {
+      form.querySelectorAll(".project-member-option").forEach((option) => option.classList.remove("is-primary-member"));
+      const ownerCheckbox = form.querySelector(`input[name="memberIds"][value="${CSS.escape(event.currentTarget.value)}"]`);
+      if (ownerCheckbox) {
+        ownerCheckbox.checked = true;
+        ownerCheckbox.closest(".project-member-option")?.classList.add("is-primary-member");
+      }
+    });
+  });
+  document.querySelector("#project-form")?.addEventListener("submit", (event) => { event.preventDefault(); void createProject(projectFormValues(event.currentTarget)); });
+  document.querySelector("#project-edit-form")?.addEventListener("submit", (event) => { event.preventDefault(); void saveProjectEdits(projectFormValues(event.currentTarget)); });
   document.querySelector("#manual-lead-form")?.addEventListener("submit", (event) => { event.preventDefault(); void createManualLead(Object.fromEntries(new FormData(event.currentTarget))); });
   document.querySelector("#lead-assignment-form")?.addEventListener("submit", (event) => { event.preventDefault(); void saveLeadAssignment(Object.fromEntries(new FormData(event.currentTarget))); });
   document.querySelector("#release-leads-form")?.addEventListener("submit", (event) => { event.preventDefault(); void releaseLeadPool(Object.fromEntries(new FormData(event.currentTarget))); });

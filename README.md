@@ -35,6 +35,7 @@ etapa seguinte equivale a confirmar a ação correspondente.
 - Kanban horizontal com retorno de etapas e rolagem por coluna;
 - cards compactos com LinkedIn, cópia de mensagem e ação principal;
 - detalhe expansível, edição, histórico, etiquetas e responsável;
+- filtro compacto por responsável no CRM e no pipeline de projetos;
 - cadastro manual e exclusão protegida de leads;
 - Banco de leads para CSVs extensos:
   - formato Apollo validado;
