@@ -36,6 +36,51 @@ assert.equal(
   "O nome do convidado deve ser extraído dos parênteses do título criado pelo Appointment Schedule.",
 );
 
+const appointmentWithCompany = runNormalizer({
+  first: () => ({
+    json: {
+      id: "calendar-event-company-answer",
+      status: "confirmed",
+      summary: "Teste CRM (Rodrigo Rosa)",
+      description: "Nome da Empresa: BOAB - Bloco de Onze Aeroportos do Brasil",
+      start: { dateTime: "2026-07-31T15:30:00-03:00" },
+      end: { dateTime: "2026-07-31T16:00:00-03:00" },
+      attendees: [
+        { email: "caio@agfcapital.com.br", organizer: true, self: true },
+        { email: "rodrigo@example.com", responseStatus: "accepted" },
+      ],
+    },
+  }),
+}, {});
+
+assert.equal(
+  appointmentWithCompany[0].json.payload.company_answer,
+  "BOAB - Bloco de Onze Aeroportos do Brasil",
+  'O normalizador deve reconhecer a pergunta "Nome da Empresa" do Appointment Schedule.',
+);
+
+const genericCalendarEvent = runNormalizer({
+  first: () => ({
+    json: {
+      id: "calendar-event-generic-title",
+      status: "confirmed",
+      summary: "Demo CRM",
+      start: { dateTime: "2026-07-31T15:30:00-03:00" },
+      end: { dateTime: "2026-07-31T16:00:00-03:00" },
+      attendees: [
+        { email: "caio@agfcapital.com.br", organizer: true, self: true },
+        { email: "salomao@agfcapital.com.br", responseStatus: "accepted" },
+      ],
+    },
+  }),
+}, {});
+
+assert.equal(
+  genericCalendarEvent[0].json.payload.guest_name,
+  null,
+  "Um título genérico do Calendar não pode ser tratado como nome do lead.",
+);
+
 const cancelled = runNormalizer({
   first: () => ({
     json: {
