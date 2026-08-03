@@ -7,6 +7,7 @@ import { chooseLatestActiveBooking } from "../calendar-bookings.js";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const source = fs.readFileSync(path.join(here, "..", "crm.js"), "utf8");
+const templateSource = fs.readFileSync(path.join(here, "..", "message-templates.js"), "utf8");
 const importerSource = fs.readFileSync(path.join(here, "..", "apollo-import.js"), "utf8");
 const poolMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000100_long_list_lead_pool.sql"), "utf8");
 const bookingLifecycleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000300_calendar_booking_lifecycle.sql"), "utf8");
@@ -27,7 +28,7 @@ assert.match(source, /function cardActions\(/,
   "As ações operacionais devem estar disponíveis diretamente no card compacto.");
 assert.match(source, /data-action="copy-message"/,
   "O cartão de conexão aceita deve permitir copiar a mensagem sem abrir o painel.");
-assert.match(source, /const inviteNoteTemplate = "\{Nome\}, tudo bem\? Tenho conversado com empresas como a \{Empresa\} sobre como aplicar IA no financeiro de forma prática\. Achei que faria sentido nos conectarmos por aqui\."/,
+assert.match(templateSource, /inviteNote: "\{Nome\}, tudo bem\? Tenho conversado com empresas como a \{Empresa\} sobre como aplicar IA no financeiro de forma prática\. Achei que faria sentido nos conectarmos por aqui\."/,
   "A nota curta do convite deve ser própria para conexão, sem reutilizar a mensagem de agenda.");
 assert.match(source, /if \(lead\.stage === "aprovado"\) return `\$\{button\("copy-invite-note"/,
   "Enviar convite deve copiar a nota curta, e nao o rascunho longo de pos-aceite.");
@@ -49,9 +50,9 @@ assert.match(source, /data-action="copy-booking-thanks"/,
   "A mensagem de agradecimento deve estar disponível diretamente no card.");
 assert.match(source, /https:\/\/calendar\.app\.google\/AUvpXz41GDT5hwD36/,
   "O link padrão deve apontar para o Appointment Schedule atual.");
-assert.match(source, /Tenho conversado com empresas como a \{Empresa\}/,
+assert.match(templateSource, /Tenho conversado com empresas como a \{Empresa\}/,
   "O rascunho padrão deve usar o novo texto aprovado para a empresa.");
-assert.match(source, /replaceAll\("\{Empresa\}"/,
+assert.match(source, /renderMessageTemplate\(state\.settings\.messageTemplates\.linkedinMessage/,
   "Todas as ocorrências da empresa no novo template devem ser personalizadas.");
 assert.match(source, /const forceStandardMessage = row\.import_origin\?\.startsWith\("Apollo CSV"\) \|\| row\.import_origin\?\.startsWith\("Banco de leads"\)/,
   "Leads vindos da base Apollo devem usar o último template padrão.");

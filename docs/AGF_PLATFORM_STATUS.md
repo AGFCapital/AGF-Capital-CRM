@@ -82,7 +82,8 @@ Kanban.
 
 ## Banco remoto
 
-As migrations até `20260731000200_project_collaboration.sql` foram aplicadas.
+As migrations até `20260802000100_shared_message_templates.sql` foram aplicadas
+no Supabase conectado.
 
 Principais extensões recentes:
 
@@ -101,6 +102,8 @@ Principais extensões recentes:
 - `commercial_project_members` e `commercial_project_links`;
 - RPC atômica `save_project_collaboration(...)`;
 - garantia de que o responsável principal sempre é membro do projeto.
+- quatro modelos de mensagem compartilhados em `app_settings`, editáveis na
+  interface com validação das variáveis obrigatórias.
 
 ## Testes atuais
 
@@ -117,6 +120,7 @@ Os contratos locais cobrem:
 - filtros pessoais no CRM e no pipeline de projetos;
 - persistência de navegação e abertura contextual dos detalhes;
 - invariantes de responsável, membros e links de projeto no banco remoto.
+- leitura, validação, serialização e renderização dos modelos de mensagem.
 
 ## Pendências para produção
 
