@@ -78,6 +78,20 @@ Use o detalhe para:
 
 Score e blocos de enriquecimento antigo não orientam mais a operação.
 
+### Editar os modelos da equipe
+
+Abra **Configurações > Modelos de mensagens** para editar:
+
+- nota do convite;
+- mensagem após o aceite;
+- mensagem de agendamento;
+- agradecimento após a reserva.
+
+Os modelos são compartilhados por todos os operadores. As variáveis exibidas
+abaixo de cada campo são obrigatórias e não podem ser removidas. A mudança
+passa a valer para novos textos padrão; rascunhos já personalizados em um card
+não são sobrescritos.
+
 ## 6. Follow-ups
 
 Todo follow-up é atribuído ao responsável atual do card. Quem criou a tarefa

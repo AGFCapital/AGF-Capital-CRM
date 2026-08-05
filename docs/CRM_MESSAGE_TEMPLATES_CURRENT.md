@@ -1,6 +1,11 @@
 # Modelos de mensagem atuais do CRM
 
-Versão do código em 29 de julho de 2026.
+Versão do código em 2 de agosto de 2026.
+
+Os quatro modelos são configurações compartilhadas, armazenadas em
+`app_settings.message_templates`. Qualquer operador autenticado pode editá-los
+em **Configurações > Modelos de mensagens**. O CRM bloqueia o salvamento caso
+uma variável obrigatória seja removida.
 
 ## Nota do convite
 
@@ -43,5 +48,6 @@ Perfeito, {Nome}. Obrigado por agendar. Nossa conversa ficou marcada para {data_
 | `{link}` | `app_settings.calendar_booking.booking_url` |
 | `{data_hora}` | reserva ativa mais recente |
 
-Leads legados podem conservar um rascunho individual histórico. Novos leads
-manuais e importados usam o modelo padrão.
+Leads legados e mensagens editadas individualmente podem conservar o rascunho
+histórico. Novos leads e textos ainda não personalizados usam o modelo
+compartilhado vigente.
