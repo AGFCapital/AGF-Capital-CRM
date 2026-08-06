@@ -1251,6 +1251,65 @@ nav { display:grid; gap:5px; }
   font-size:8px;
 }
 
+/* Enviar convite: selecao multipla para abrir varios perfis do LinkedIn de uma vez. */
+.column-bulk {
+  flex:none;
+  display:grid;
+  gap:7px;
+  margin-bottom:10px;
+  padding:9px;
+  border:1px solid #d3daea;
+  border-radius:8px;
+  background:#f4f7ff;
+}
+.column-bulk-open {
+  width:100%;
+  padding:8px 6px;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.2;
+}
+.column-bulk-open:disabled {
+  background:#c8d0e2;
+  cursor:not-allowed;
+}
+.column-bulk-all {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  font-weight:700;
+  color:#4a5464;
+  cursor:pointer;
+}
+.column-bulk-all input {
+  width:13px;
+  height:13px;
+  accent-color:var(--blue);
+  cursor:pointer;
+}
+.column-bulk-warning {
+  color:#a85f16;
+  font-size:9px;
+  font-weight:700;
+}
+.card-select {
+  display:inline-flex;
+  align-items:center;
+  margin-right:7px;
+  cursor:pointer;
+}
+.card-select input {
+  width:13px;
+  height:13px;
+  accent-color:var(--blue);
+  cursor:pointer;
+}
+.lead-card.selected {
+  border-color:#6f86e0;
+  box-shadow:0 0 0 1px #6f86e0 inset;
+}
+
 @media (max-width:900px) {
   .project-team-grid,
   .project-copy-grid {

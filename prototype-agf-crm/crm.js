@@ -108,7 +108,7 @@ const state = {
   selectedId: null, selectedProjectId: null, page: readActiveCrmPage(), draggedId: null, draggedProjectId: null,
   settingsOpen: false, projectModal: null, manualLeadModal: false, followUpTarget: null, importModal: null, followUpNotificationTimer: null,
   searchQuery: "", notificationCenterOpen: false, notificationView: "mine",
-  leadOwnerFilter: "all", projectOwnerFilter: "all",
+  leadOwnerFilter: "all", projectOwnerFilter: "all", inviteSelection: [],
   remoteRefreshTimer: null, remoteRefreshInFlight: false,
   remote: { config: null, session: readSession(), enabled: false, loading: true, error: null },
 };
@@ -426,9 +426,58 @@ function cardActions(lead) {
   if (lead.stage === "call_marcada") return `${button("copy-booking-thanks", "Copiar agradecimento", "secondary")}${button("create-project-now", "Criar projeto")}`;
   return "";
 }
-function card(lead) { const due = lead.followUps.find((item) => item.status === "open"); const actions = cardActions(lead); const age = lead.stage === "descartado" ? null : leadAgeState(lead.stageEnteredAt); const labels = [lead.organizationLabel ? `<span class="card-label organization">${escapeHtml(lead.organizationLabel)}</span>` : "", lead.responsibleName ? `<span class="card-label responsible">${escapeHtml(lead.responsibleName)}</span>` : ""].join(""); return `<article class="lead-card ${age ? `aged ${age.tone}` : ""}" draggable="true" data-lead="${lead.id}" tabindex="0"><div class="card-top"><span class="badge ${sourceClass(lead.source)}">${lead.source}</span>${age ? `<span class="age-alert ${age.tone}" title="Entrou nesta etapa em ${humanDate(lead.stageEnteredAt)}">${age.days}d</span>` : ""}</div><h3>${escapeHtml(lead.company)}</h3><p class="contact">${escapeHtml(lead.contact)}<span>${escapeHtml(lead.role)}</span></p>${labels ? `<div class="card-labels">${labels}</div>` : ""}${age ? `<p class="age-copy">${age.label}</p>` : ""}${lead.meeting ? `<p class="meeting">${lead.meeting}</p>` : ""}${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}${actions ? `<div class="card-actions">${actions}</div>` : ""}<footer><span class="card-stage">${stageNames[lead.stage]}</span>${lead.linkedinUrl ? `<button class="card-linkedin" data-action="open-linkedin" data-lead="${lead.id}">LinkedIn ↗</button>` : ""}</footer></article>`; }
+function visibleOperationLeads() { return state.leadOwnerFilter === "all" ? state.leads : state.leads.filter((lead) => lead.responsibleId === state.leadOwnerFilter); }
+function inviteColumnLeads() { return visibleOperationLeads().filter((lead) => lead.stage === "aprovado"); }
+function isInviteSelected(leadId) { return state.inviteSelection.includes(leadId); }
+// A selecao so existe enquanto o card continua visivel em Enviar convite: mudar
+// de etapa, trocar o filtro de responsavel ou apagar o lead a limpa sozinha.
+function pruneInviteSelection(visibleLeads) {
+  const selectable = new Set(visibleLeads.filter((lead) => lead.stage === "aprovado").map((lead) => lead.id));
+  state.inviteSelection = state.inviteSelection.filter((id) => selectable.has(id));
+}
+function rerenderBoard() { const viewport = captureBoardViewport(); render(); restoreBoardViewport(viewport); }
+function toggleInviteSelection(leadId, selected) {
+  state.inviteSelection = selected ? [...new Set([...state.inviteSelection, leadId])] : state.inviteSelection.filter((id) => id !== leadId);
+  rerenderBoard();
+}
+function setInviteSelectionAll(selected) {
+  state.inviteSelection = selected ? inviteColumnLeads().map((lead) => lead.id) : [];
+  rerenderBoard();
+}
+function perfisLabel(total) { return total === 1 ? "1 perfil" : `${total} perfis`; }
+// Sem nada marcado o botao vale para a coluna inteira: um clique so abre tudo,
+// sem passar por Selecionar todos antes.
+function inviteProfilesToOpen() {
+  const items = inviteColumnLeads();
+  const selected = items.filter((lead) => isInviteSelected(lead.id));
+  return selected.length ? selected : items;
+}
+// As abas precisam sair no mesmo gesto do clique; qualquer setTimeout perde o
+// user gesture e o navegador bloqueia tudo depois da primeira.
+function openSelectedInviteProfiles() {
+  const target = inviteProfilesToOpen();
+  const openable = target.filter((lead) => lead.linkedinUrl);
+  if (!openable.length) { toast("Nenhum lead desta etapa tem URL do LinkedIn."); return; }
+  if (openable.length > 10 && !window.confirm(`Abrir ${openable.length} abas do LinkedIn de uma vez? O navegador pode ficar lento.`)) return;
+  const blocked = openable.filter((lead) => !window.open(lead.linkedinUrl, "_blank", "noopener,noreferrer")).length;
+  if (blocked) { toast(`O navegador bloqueou ${blocked} de ${openable.length} aba(s). Libere pop-ups para este site e tente de novo.`); return; }
+  const missing = target.length - openable.length;
+  toast(`${openable.length} ${openable.length === 1 ? "perfil aberto" : "perfis abertos"} em abas.${missing ? ` ${missing} sem URL do LinkedIn.` : ""}`);
+}
+function inviteSelectBox(lead) {
+  if (lead.stage !== "aprovado") return "";
+  return `<label class="card-select" data-action="select-invite-lead" title="Selecionar para abrir o perfil em aba"><input type="checkbox" data-invite-select="${lead.id}" ${isInviteSelected(lead.id) ? "checked" : ""} aria-label="Selecionar ${escapeHtml(lead.contact)} para abrir em aba"></label>`;
+}
+function inviteBulkBar(items) {
+  if (!items.length) return "";
+  const selected = items.filter((lead) => isInviteSelected(lead.id));
+  const withoutUrl = (selected.length ? selected : items).filter((lead) => !lead.linkedinUrl).length;
+  const label = selected.length ? `Abrir ${perfisLabel(selected.length)} em abas` : `Abrir todos os perfis (${items.length})`;
+  return `<div class="column-bulk"><button class="button primary column-bulk-open" data-action="open-selected-linkedin">${label}</button><label class="column-bulk-all" data-action="toggle-invite-all"><input type="checkbox" data-invite-all ${selected.length === items.length ? "checked" : ""}><span>${selected.length ? `${selected.length} de ${items.length} selecionados` : "Selecionar todos"}</span></label>${withoutUrl ? `<small class="column-bulk-warning">${withoutUrl} sem URL do LinkedIn</small>` : ""}</div>`;
+}
+function card(lead) { const due = lead.followUps.find((item) => item.status === "open"); const actions = cardActions(lead); const age = lead.stage === "descartado" ? null : leadAgeState(lead.stageEnteredAt); const labels = [lead.organizationLabel ? `<span class="card-label organization">${escapeHtml(lead.organizationLabel)}</span>` : "", lead.responsibleName ? `<span class="card-label responsible">${escapeHtml(lead.responsibleName)}</span>` : ""].join(""); return `<article class="lead-card ${age ? `aged ${age.tone}` : ""} ${isInviteSelected(lead.id) ? "selected" : ""}" draggable="true" data-lead="${lead.id}" tabindex="0"><div class="card-top">${inviteSelectBox(lead)}<span class="badge ${sourceClass(lead.source)}">${lead.source}</span>${age ? `<span class="age-alert ${age.tone}" title="Entrou nesta etapa em ${humanDate(lead.stageEnteredAt)}">${age.days}d</span>` : ""}</div><h3>${escapeHtml(lead.company)}</h3><p class="contact">${escapeHtml(lead.contact)}<span>${escapeHtml(lead.role)}</span></p>${labels ? `<div class="card-labels">${labels}</div>` : ""}${age ? `<p class="age-copy">${age.label}</p>` : ""}${lead.meeting ? `<p class="meeting">${lead.meeting}</p>` : ""}${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}${actions ? `<div class="card-actions">${actions}</div>` : ""}<footer><span class="card-stage">${stageNames[lead.stage]}</span>${lead.linkedinUrl ? `<button class="card-linkedin" data-action="open-linkedin" data-lead="${lead.id}">LinkedIn ↗</button>` : ""}</footer></article>`; }
 function emptyStage(column) { const messages = { base: "Leads cadastrados aguardam a proxima acao.", invite: "Abra o perfil, envie o convite e registre o envio.", pending: "Aguarde o aceite ou atualize manualmente.", accepted: "A mensagem longa esta pronta para copiar e editar.", message: "Registre quando houver resposta.", conversation: "Leads com conversa ativa.", scheduling: "Envie manualmente o link da agenda.", booked: "Reservas do Calendar aparecem aqui.", "create-project": "Arraste para ca uma call com interesse. O card vira um projeto em Pos-call.", discarded: "Leads descartados com motivo." }; return `<div class="empty-state">${messages[column] || "Sem cards nesta etapa."}</div>`; }
-function operationPage() { const visibleLeads = state.leadOwnerFilter === "all" ? state.leads : state.leads.filter((lead) => lead.responsibleId === state.leadOwnerFilter); const board = boardColumns.map((column) => { const items = visibleLeads.filter((lead) => column.stages.includes(lead.stage)); return `<section class="kanban-column" data-column="${column.key}" data-target="${stageDropTargets[column.key] || ""}"><header><h2>${column.label}</h2><span>${items.length}</span></header><div class="cards">${items.map(card).join("") || emptyStage(column.key)}</div></section>`; }).join(""); return appShell(`${header("OPERAÇÃO COMERCIAL", "Base de clientes", "Arraste o card para avançar ou voltar etapas; abra-o para revisar o contexto.", `<button class="button primary" data-action="new-manual-lead">Novo lead</button><button class="button secondary" data-action="import-csv">Banco de leads <span class="button-count">${state.leadPool.available || 0}</span></button><button class="button secondary" data-action="settings">Configurações</button>`) }${metrics()}<div class="board-caption"><span>O Kanban é horizontal; cada coluna mantém sua própria rolagem de cards.</span><div><span class="status-dot"></span> LinkedIn operado manualmente</div></div><div class="kanban-scroll"><div class="kanban">${board}</div></div>${drawOverlays()}`); }
+function operationPage() { const visibleLeads = visibleOperationLeads(); pruneInviteSelection(visibleLeads); const board = boardColumns.map((column) => { const items = visibleLeads.filter((lead) => column.stages.includes(lead.stage)); const bulk = column.key === "invite" ? inviteBulkBar(items) : ""; return `<section class="kanban-column" data-column="${column.key}" data-target="${stageDropTargets[column.key] || ""}"><header><h2>${column.label}</h2><span>${items.length}</span></header>${bulk}<div class="cards">${items.map(card).join("") || emptyStage(column.key)}</div></section>`; }).join(""); return appShell(`${header("OPERAÇÃO COMERCIAL", "Base de clientes", "Arraste o card para avançar ou voltar etapas; abra-o para revisar o contexto.", `<button class="button primary" data-action="new-manual-lead">Novo lead</button><button class="button secondary" data-action="import-csv">Banco de leads <span class="button-count">${state.leadPool.available || 0}</span></button><button class="button secondary" data-action="settings">Configurações</button>`) }${metrics()}<div class="board-caption"><span>O Kanban é horizontal; cada coluna mantém sua própria rolagem de cards.</span><div><span class="status-dot"></span> LinkedIn operado manualmente</div></div><div class="kanban-scroll"><div class="kanban">${board}</div></div>${drawOverlays()}`); }
 function stageAction(lead) {
   if (["revisao_manual", "qualificado"].includes(lead.stage)) return `<button class="button primary" data-action="move-to-invite" data-lead="${lead.id}">Mover para Enviar convite</button>`;
   if (lead.stage === "aprovado") return `<div class="manual-action"><p>Copie a nota, abra o perfil, envie o convite manualmente e volte para registrar.</p><button class="button secondary" data-action="copy-invite-note" data-lead="${lead.id}">Copiar nota</button><button class="button secondary" data-action="open-linkedin" data-lead="${lead.id}">Abrir perfil</button><button class="button primary" data-action="invite-sent" data-lead="${lead.id}">Enviei o convite</button></div>`;
@@ -905,6 +954,8 @@ function bindEvents() {
     render();
   }));
   document.querySelectorAll("[data-lead]").forEach((element) => element.addEventListener("click", (event) => { if (event.target.closest("[data-action]")) return; state.selectedId = element.dataset.lead; render(); }));
+  document.querySelectorAll("[data-invite-select]").forEach((input) => input.addEventListener("change", () => toggleInviteSelection(input.dataset.inviteSelect, input.checked)));
+  document.querySelector("[data-invite-all]")?.addEventListener("change", (event) => setInviteSelectionAll(event.target.checked));
   document.querySelectorAll(".lead-card").forEach((cardNode) => { cardNode.addEventListener("dragstart", () => { state.draggedId = cardNode.dataset.lead; cardNode.classList.add("dragging"); }); cardNode.addEventListener("dragend", () => { state.draggedId = null; cardNode.classList.remove("dragging"); }); });
   document.querySelectorAll(".kanban-column").forEach((column) => {
     column.addEventListener("dragover", (event) => {
@@ -951,6 +1002,7 @@ function bindEvents() {
   document.querySelectorAll("[data-action=create-project-now]").forEach((button) => button.addEventListener("click", () => {
     if (button.dataset.lead) void promoteLeadToProject(button.dataset.lead);
   }));
+  document.querySelectorAll("[data-action=open-selected-linkedin]").forEach((button) => button.addEventListener("click", () => openSelectedInviteProfiles()));
   document.querySelectorAll("[data-action=import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));
   document.querySelectorAll("[data-action=close-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = null; render(); }));
   document.querySelectorAll("[data-action=reset-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));

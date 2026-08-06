@@ -199,4 +199,23 @@ assert.equal(chooseLatestActiveBooking([
   },
 ]), null, "Reserva sem correspondencia nao pode aparecer no card de um lead.");
 
+assert.match(source, /column\.key === "invite" \? inviteBulkBar\(items\) : ""/,
+  "A barra de selecao em massa deve aparecer so na coluna Enviar convite.");
+assert.match(source, /data-action="open-selected-linkedin"/,
+  "A coluna Enviar convite deve ter um botao no topo para abrir os perfis selecionados.");
+assert.match(source, /if \(lead\.stage !== "aprovado"\) return "";/,
+  "Somente os cards de Enviar convite podem oferecer o checkbox de selecao.");
+assert.match(source, /function openSelectedInviteProfiles\(\) \{[\s\S]*?openable\.filter\(\(lead\) => !window\.open\(lead\.linkedinUrl, "_blank", "noopener,noreferrer"\)\)/,
+  "As abas devem ser abertas no mesmo gesto do clique, sem timer que perca o user gesture.");
+assert.match(source, /return selected\.length \? selected : items;/,
+  "Sem nada marcado o botao deve valer para a coluna inteira, em um clique so.");
+assert.match(source, /openable\.length > 10 && !window\.confirm\(/,
+  "Abrir a coluna inteira em abas deve pedir confirmacao acima de dez perfis.");
+assert.match(source, /O navegador bloqueou \$\{blocked\} de \$\{openable\.length\} aba\(s\)/,
+  "O bloqueio de pop-ups deve ser informado ao operador em vez de falhar em silencio.");
+assert.match(source, /function pruneInviteSelection\(/,
+  "A selecao deve se limpar sozinha quando o card sai da etapa ou do filtro atual.");
+assert.match(source, /function rerenderBoard\(\) \{ const viewport = captureBoardViewport\(\); render\(\); restoreBoardViewport\(viewport\); \}/,
+  "Marcar um card nao pode jogar a coluna de volta para o topo.");
+
 console.log("kanban interaction contract: ok");
