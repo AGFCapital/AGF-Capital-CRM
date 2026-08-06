@@ -91,12 +91,17 @@ Supabase de produção é o projeto AGF `icsilintddvfwhhxwqte`. Em 6 de agosto d
 aplicadas pela CLI. Os quatro perfis antigos foram remapeados para os novos
 UUIDs do Auth por e-mail, sem perder ownership.
 
-A validação pós-importação confirmou 5 usuários e 5 perfis, 91 empresas, 92
-contatos, 628 registros no banco de leads, 89 leads, 3 projetos, 12 follow-ups,
-21 reservas de agenda e 381 atividades. Nenhuma referência de responsável,
-membro de projeto, destinatário de follow-up ou host de agenda ficou quebrada.
-Os cinco perfis ainda estavam sem `booking_url` e sem agenda habilitada no
-momento da auditoria.
+A reconciliação final de 6 de agosto tratou o Supabase antigo, ainda usado pela
+produção, como fonte oficial e atualizou o projeto AGF antes do corte. A
+validação diferencial retornou `CUTOVER_SAFE`: os dois bancos ficaram com os
+mesmos 88 leads, as mesmas etapas e 617 atividades, sem IDs ausentes ou versões
+defasadas.
+
+A auditoria pós-sincronização confirmou 5 usuários e 5 perfis, 91 empresas, 92
+contatos, 628 registros no banco de leads, 3 projetos, 12 follow-ups e 21
+reservas de agenda. Nenhuma referência de responsável, membro de projeto,
+destinatário de follow-up ou host de agenda ficou quebrada. Os cinco perfis
+ainda estavam sem `booking_url` e sem agenda habilitada no momento da auditoria.
 
 Principais extensões recentes:
 
