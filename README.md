@@ -34,6 +34,8 @@ etapa seguinte equivale a confirmar a ação correspondente.
 - busca global de leads;
 - Kanban horizontal com retorno de etapas e rolagem por coluna;
 - cards compactos com LinkedIn, cópia de mensagem e ação principal;
+- seleção múltipla em Enviar convite para abrir vários perfis do LinkedIn em
+  abas de uma vez;
 - detalhe expansível, edição, histórico, etiquetas e responsável;
 - modelos de convite, mensagem, agenda e agradecimento editáveis nas
   Configurações e compartilhados pela equipe;
@@ -47,6 +49,8 @@ etapa seguinte equivale a confirmar a ação correspondente.
   - liberação de 1 a 100 leads da base escolhida;
 - follow-ups individuais para leads e projetos, com sino, visão da equipe e e-mail via n8n;
 - alerta visual para cards parados;
+- aceite de convite do LinkedIn lido por e-mail, movendo o card de Convite
+  pendente para Conexão aceita sem toque manual;
 - Google Appointment Schedule com atualização automática da call;
 - tratamento de criação, remarcação e cancelamento;
 - pipeline comercial independente com criação manual;
@@ -122,7 +126,7 @@ As migrations mais recentes adicionam:
 
 ```powershell
 node --check .\prototype-agf-crm\crm.js
-Get-ChildItem .\prototype-agf-crm\test\*.test.mjs |
+Get-ChildItem .\prototype-agf-crm\test\*.test.mjs, .\n8n\workflows\*.test.mjs |
   ForEach-Object { node $_.FullName }
 ```
 

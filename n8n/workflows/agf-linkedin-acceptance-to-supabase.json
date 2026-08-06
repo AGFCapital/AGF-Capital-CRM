@@ -1,0 +1,136 @@
+{
+  "name": "AGF | LinkedIn aceite -> Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "from:invitations@linkedin.com (subject:\"accepted your invitation\" OR subject:\"aceitou seu convite\")"
+        },
+        "options": {}
+      },
+      "id": "5e0a1c2f-8b41-4d6a-9c07-2f1b7a4d3e11",
+      "name": "Aceite recebido no Gmail",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agf-linkedin-acceptance-test",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "b7c3d29a-1f54-4a08-8e6d-5c9f0a2b6d34",
+      "name": "Webhook somente para teste",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const incoming = $input.first().json;\nconst isTestWebhook = incoming.body !== undefined && incoming.query !== undefined;\nif (isTestWebhook) {\n  const expectedSecret = $vars.AGF_LINKEDIN_WEBHOOK_SECRET;\n  const receivedSecret = incoming.headers?.['x-agf-webhook-secret'] || incoming.headers?.['X-AGF-Webhook-Secret'];\n  if (!expectedSecret || receivedSecret !== expectedSecret) throw new Error('Webhook de teste do LinkedIn não autorizado.');\n}\nconst message = isTestWebhook ? incoming.body : incoming;\nconst readHeader = (name) => {\n  const direct = message.headers?.[name.toLowerCase()] ?? message.headers?.[name];\n  if (typeof direct === 'string') return direct;\n  const list = Array.isArray(message.payload?.headers) ? message.payload.headers : [];\n  return list.find((item) => String(item.name).toLowerCase() === name.toLowerCase())?.value ?? '';\n};\nconst messageId = message.id ?? message.message_id ?? '';\nif (!messageId) throw new Error('Mensagem do Gmail sem identificador.');\nconst from = message.from ?? readHeader('From');\nconst address = (from.match(/<([^>]+)>/)?.[1] ?? from).trim().toLowerCase();\n// So o remetente oficial de convites conta. Newsletter e resumo semanal do\n// LinkedIn tambem citam nomes e nao podem mover card nenhum.\nif (address !== 'invitations@linkedin.com') return [];\nconst subject = message.subject ?? readHeader('Subject');\nif (!/accepted your invitation|aceitou seu convite|aceitou o seu convite/i.test(subject)) return [];\n// O assunto traz so o primeiro nome; o nome completo esta no display do\n// remetente, no formato \"Fulano de Tal via LinkedIn\".\nconst fullName = from\n  .replace(/<[^>]*>/, '')\n  .replace(/^[\\s\"']+|[\\s\"']+$/g, '')\n  .replace(/\\s+via\\s+LinkedIn\\s*$/i, '')\n  .trim();\nif (!fullName) throw new Error('E-mail de aceite sem nome no remetente.');\nconst html = String(message.html ?? message.textHtml ?? '');\nconst plain = String(message.text ?? message.textPlain ?? '');\nconst body = (plain || html\n  .replace(/<br\\s*\\/?\\s*>/gi, '\\n')\n  .replace(/<\\/(?:p|div|li|tr|td|h\\d)>/gi, '\\n')\n  .replace(/<[^>]+>/g, ''))\n  .replace(/&amp;/gi, '&')\n  .replace(/&nbsp;/gi, ' ')\n  .replace(/&#39;/gi, \"'\")\n  .replace(/&quot;/gi, '\"')\n  .replace(/\\r/g, '');\nconst lines = body.split('\\n').map((line) => line.trim()).filter(Boolean);\n// O cargo e sempre a linha logo abaixo da repeticao do nome completo. E dele\n// que sai a empresa usada para desempatar homonimos no Supabase.\nconst nameIndex = lines.findIndex((line) => line.toLowerCase() === fullName.toLowerCase());\nconst candidate = nameIndex >= 0 ? (lines[nameIndex + 1] ?? '') : '';\nconst headline = /^(message|mensagem|ver perfil|view profile|https?:)/i.test(candidate) || candidate.length > 200\n  ? ''\n  : candidate;\nconst receivedAt = message.internalDate\n  ? new Date(Number(message.internalDate)).toISOString()\n  : (readHeader('Date') ? new Date(readHeader('Date')).toISOString() : new Date().toISOString());\nreturn [{\n  json: {\n    payload: {\n      message_id: messageId,\n      full_name: fullName,\n      headline,\n      received_at: receivedAt,\n    },\n  },\n}];\n"
+      },
+      "id": "c1d8f4b6-3a72-49e5-b0c4-7d6e8f1a9b52",
+      "name": "Normalizar aceite",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yyhstftoxecrtxqcydew.supabase.co/rest/v1/rpc/sync_linkedin_connection_acceptance",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ p_payload: $json.payload }) }}",
+        "options": {}
+      },
+      "id": "e9a5b0c7-6d31-4f28-9a7b-3c4d5e6f7a80",
+      "name": "Sincronizar aceite no Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        96
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Aceite recebido no Gmail": {
+      "main": [
+        [
+          {
+            "node": "Normalizar aceite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook somente para teste": {
+      "main": [
+        [
+          {
+            "node": "Normalizar aceite",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalizar aceite": {
+      "main": [
+        [
+          {
+            "node": "Sincronizar aceite no Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

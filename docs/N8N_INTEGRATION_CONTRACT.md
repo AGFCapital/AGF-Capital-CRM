@@ -1,14 +1,15 @@
 # AGF CRM — contrato atual de integrações n8n
 
-**Versão:** 3.0
-**Atualizado em:** 31 de julho de 2026
+**Versão:** 3.1
+**Atualizado em:** 6 de agosto de 2026
 
 ## 1. Escopo ativo
 
 O n8n executa somente:
 
 1. sincronização do Google Calendar com o CRM;
-2. entrega de lembretes de follow-up por Gmail.
+2. entrega de lembretes de follow-up por Gmail;
+3. leitura do e-mail de aceite de convite do LinkedIn.
 
 Não participa do fluxo ativo:
 
@@ -17,7 +18,10 @@ Não participa do fluxo ativo:
 - Google Sheets;
 - Gemini;
 - PhantomBuster;
-- convite ou mensagem no LinkedIn.
+- envio de convite ou mensagem no LinkedIn.
+
+O item 3 lê uma notificação que o LinkedIn manda; não automatiza nenhuma ação
+dentro do LinkedIn. Convite, mensagem e resposta continuam manuais.
 
 ## 2. Princípios
 
@@ -97,7 +101,39 @@ O workflow lê `follow_up_email_deliveries` pendentes. A fila já contém:
 - data e hora;
 - link da aplicação quando disponível.
 
-## 5. Credenciais
+## 5. Workflow LinkedIn aceite → Supabase
+
+Objetivo: mover o card de `convite_enviado` para `conexao_aceita` assim que o
+aceite for notificado por e-mail, sem o operador reabrir o LinkedIn para
+conferir.
+
+Entrada: Gmail Trigger na conta `giulio@agfcapital.com.br`, filtrado por
+`from:invitations@linkedin.com` com assunto de aceite.
+
+Saída: RPC `sync_linkedin_connection_acceptance`.
+
+Regras:
+
+- só o remetente `invitations@linkedin.com` dispara; newsletter e resumo
+  semanal do LinkedIn também citam nomes e são descartados;
+- o nome completo vem do display do remetente (`Fulano via LinkedIn`), porque
+  o assunto traz apenas o primeiro nome;
+- o cargo com a empresa vem da linha logo abaixo da repetição do nome no
+  corpo, e serve de desempate entre homônimos;
+- `message_id` do Gmail é a chave de idempotência: reprocessar a mesma
+  mensagem devolve `already_applied` e não move nada;
+- só cards em `convite_enviado` avançam;
+- casar, nesta ordem, por nome completo normalizado e por primeiro mais último
+  nome com a empresa conferindo;
+- não escolher entre candidatos ambíguos;
+- toda execução grava uma linha em `connection_sync_runs`, com o motivo em
+  `error_summary` quando não houve match.
+
+O aceite registrado por e-mail grava a mesma atividade `connection_accepted`
+do botão Confirmar aceite, para o histórico do card ler igual nos dois casos.
+A diferença fica em `metadata.source = linkedin_email`.
+
+## 6. Credenciais
 
 No n8n:
 
@@ -112,7 +148,7 @@ Na aplicação:
 
 Nunca documentar valores reais de secrets.
 
-## 6. Erros e observabilidade
+## 7. Erros e observabilidade
 
 | Caso | Comportamento |
 |---|---|
@@ -122,14 +158,17 @@ Nunca documentar valores reais de secrets.
 | Gmail falha | marcar entrega `failed`; follow-up continua aberto |
 | Supabase indisponível | workflow falha com log; não inventar sucesso |
 | Credencial expirada | interromper e notificar operador |
+| Aceite sem match no LinkedIn | `unmatched`, card fica em Convite pendente |
+| Aceite ambíguo no LinkedIn | `ambiguous`, nenhum card é escolhido |
+| Mesmo e-mail de aceite reentregue | `already_applied`, nada muda |
 
-## 7. Workflows inativos preservados
+## 8. Workflows inativos preservados
 
 O JSON de Apollo pode permanecer arquivado como protótipo. Não deve ser
 ativado enquanto a entrada oficial for CSV. Workflows antigos de Sheets,
 extração, Gemini ou LinkedIn estão obsoletos.
 
-## 8. Checklist de produção
+## 9. Checklist de produção
 
 - trocar Calendar de teste pela conta do Giulio;
 - confirmar pergunta obrigatória `Empresa`;
@@ -137,4 +176,8 @@ extração, Gemini ou LinkedIn estão obsoletos.
 - testar criar, remarcar e cancelar;
 - testar follow-up com e-mail habilitado e desabilitado;
 - repetir eventos para validar idempotência;
-- revisar credenciais e limitar acesso ao projeto n8n.
+- revisar credenciais e limitar acesso ao projeto n8n;
+- confirmar que o LinkedIn está com giulio@agfcapital.com.br como e-mail
+  primário, senão o aceite nunca chega na caixa monitorada;
+- reenviar um aceite antigo pelo webhook de teste e conferir que a segunda
+  execução devolve `already_applied`.
