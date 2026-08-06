@@ -35,7 +35,7 @@ etapa seguinte equivale a confirmar a ação correspondente.
 - Kanban horizontal com retorno de etapas e rolagem por coluna;
 - cards compactos com LinkedIn, cópia de mensagem e ação principal;
 - seleção múltipla em Enviar convite para abrir vários perfis do LinkedIn em
-  abas de uma vez;
+  abas e registrar o envio da mesma leva de uma vez;
 - detalhe expansível, edição, histórico, etiquetas e responsável;
 - modelos de convite, mensagem, agenda e agradecimento editáveis nas
   Configurações e compartilhados pela equipe;

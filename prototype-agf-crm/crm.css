@@ -1262,16 +1262,20 @@ nav { display:grid; gap:5px; }
   border-radius:8px;
   background:#f4f7ff;
 }
-.column-bulk-open {
+.column-bulk-open,
+.column-bulk-sent {
   width:100%;
   padding:8px 6px;
   font-size:10px;
   font-weight:800;
   line-height:1.2;
 }
-.column-bulk-open:disabled {
+.column-bulk-open:disabled,
+.column-bulk-sent:disabled {
   background:#c8d0e2;
-  cursor:not-allowed;
+  border-color:#c8d0e2;
+  color:#fff;
+  cursor:progress;
 }
 .column-bulk-all {
   display:flex;

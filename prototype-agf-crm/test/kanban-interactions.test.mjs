@@ -211,6 +211,16 @@ assert.match(source, /return selected\.length \? selected : items;/,
   "Sem nada marcado o botao deve valer para a coluna inteira, em um clique so.");
 assert.match(source, /openable\.length > 10 && !window\.confirm\(/,
   "Abrir a coluna inteira em abas deve pedir confirmacao acima de dez perfis.");
+assert.match(source, /data-action="mark-invites-sent"/,
+  "Depois de abrir os perfis o operador precisa registrar o envio da mesma leva de uma vez.");
+assert.match(source, /function markInviteSelectionAsSent\([\s\S]*?const transition = leadTransitions\(\)\.convite_enviado;/,
+  "O registro em lote deve reusar a mesma transicao do botao individual, e nao um texto paralelo.");
+assert.match(source, /function markInviteSelectionAsSent\([\s\S]*?if \(!window\.confirm\(/,
+  "Mover a coluna inteira de etapa e irreversivel na pratica e precisa de confirmacao.");
+assert.match(source, /function markInviteSelectionAsSent\([\s\S]*?await reloadAndRender\(/,
+  "O lote deve recarregar uma vez no fim, e nao a cada card.");
+assert.match(source, /const transition = leadTransitions\(\)\[targetStage\];/,
+  "completeLeadDrop e o lote precisam ler a mesma tabela de transicoes.");
 assert.match(source, /O navegador bloqueou \$\{blocked\} de \$\{openable\.length\} aba\(s\)/,
   "O bloqueio de pop-ups deve ser informado ao operador em vez de falhar em silencio.");
 assert.match(source, /function pruneInviteSelection\(/,

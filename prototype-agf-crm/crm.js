@@ -464,6 +464,39 @@ function openSelectedInviteProfiles() {
   const missing = target.length - openable.length;
   toast(`${openable.length} ${openable.length === 1 ? "perfil aberto" : "perfis abertos"} em abas.${missing ? ` ${missing} sem URL do LinkedIn.` : ""}`);
 }
+// O par do botao de abrir: depois de mandar os convites no LinkedIn, um clique
+// registra o envio da mesma leva, em vez de trinta e seis cliques em Convite
+// enviado. Roda em serie porque cada card grava atividade antes de mudar a
+// etapa, e recarrega uma vez so no fim.
+async function markInviteSelectionAsSent(button) {
+  const target = inviteProfilesToOpen();
+  if (!target.length) { toast("Nenhum lead nesta etapa."); return; }
+  if (!window.confirm(`Registrar convite enviado para ${perfisLabel(target.length)}? Os cards vao para Convite pendente.`)) return;
+  const transition = leadTransitions().convite_enviado;
+  const originalLabel = button?.textContent;
+  const failed = [];
+  let done = 0;
+  if (button) button.disabled = true;
+  for (const lead of target) {
+    if (button) button.textContent = `Registrando ${done + 1} de ${target.length}...`;
+    try {
+      await recordActivity(lead.id, transition.activity, transition.summary);
+      await supabaseRequest(`/rest/v1/leads?id=eq.${encodeURIComponent(lead.id)}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=minimal" },
+        body: JSON.stringify({ current_stage: "convite_enviado", ...transition.extra }),
+      });
+      done += 1;
+    } catch {
+      failed.push(lead.company);
+    }
+  }
+  state.inviteSelection = [];
+  if (button) { button.disabled = false; button.textContent = originalLabel; }
+  await reloadAndRender(failed.length
+    ? `${done} de ${target.length} registrados. Ficaram para tras: ${failed.slice(0, 3).join(", ")}${failed.length > 3 ? " e outros" : ""}.`
+    : `${done} ${done === 1 ? "convite registrado" : "convites registrados"} como pendentes.`);
+}
 function inviteSelectBox(lead) {
   if (lead.stage !== "aprovado") return "";
   return `<label class="card-select" data-action="select-invite-lead" title="Selecionar para abrir o perfil em aba"><input type="checkbox" data-invite-select="${lead.id}" ${isInviteSelected(lead.id) ? "checked" : ""} aria-label="Selecionar ${escapeHtml(lead.contact)} para abrir em aba"></label>`;
@@ -473,7 +506,10 @@ function inviteBulkBar(items) {
   const selected = items.filter((lead) => isInviteSelected(lead.id));
   const withoutUrl = (selected.length ? selected : items).filter((lead) => !lead.linkedinUrl).length;
   const label = selected.length ? `Abrir ${perfisLabel(selected.length)} em abas` : `Abrir todos os perfis (${items.length})`;
-  return `<div class="column-bulk"><button class="button primary column-bulk-open" data-action="open-selected-linkedin">${label}</button><label class="column-bulk-all" data-action="toggle-invite-all"><input type="checkbox" data-invite-all ${selected.length === items.length ? "checked" : ""}><span>${selected.length ? `${selected.length} de ${items.length} selecionados` : "Selecionar todos"}</span></label>${withoutUrl ? `<small class="column-bulk-warning">${withoutUrl} sem URL do LinkedIn</small>` : ""}</div>`;
+  const sentLabel = selected.length
+    ? `Marcar ${selected.length} como ${selected.length === 1 ? "enviado" : "enviados"}`
+    : `Marcar todos como enviados (${items.length})`;
+  return `<div class="column-bulk"><button class="button primary column-bulk-open" data-action="open-selected-linkedin">${label}</button><button class="button secondary column-bulk-sent" data-action="mark-invites-sent">${sentLabel}</button><label class="column-bulk-all" data-action="toggle-invite-all"><input type="checkbox" data-invite-all ${selected.length === items.length ? "checked" : ""}><span>${selected.length ? `${selected.length} de ${items.length} selecionados` : "Selecionar todos"}</span></label>${withoutUrl ? `<small class="column-bulk-warning">${withoutUrl} sem URL do LinkedIn</small>` : ""}</div>`;
 }
 function card(lead) { const due = lead.followUps.find((item) => item.status === "open"); const actions = cardActions(lead); const age = lead.stage === "descartado" ? null : leadAgeState(lead.stageEnteredAt); const labels = [lead.organizationLabel ? `<span class="card-label organization">${escapeHtml(lead.organizationLabel)}</span>` : "", lead.responsibleName ? `<span class="card-label responsible">${escapeHtml(lead.responsibleName)}</span>` : ""].join(""); return `<article class="lead-card ${age ? `aged ${age.tone}` : ""} ${isInviteSelected(lead.id) ? "selected" : ""}" draggable="true" data-lead="${lead.id}" tabindex="0"><div class="card-top">${inviteSelectBox(lead)}<span class="badge ${sourceClass(lead.source)}">${lead.source}</span>${age ? `<span class="age-alert ${age.tone}" title="Entrou nesta etapa em ${humanDate(lead.stageEnteredAt)}">${age.days}d</span>` : ""}</div><h3>${escapeHtml(lead.company)}</h3><p class="contact">${escapeHtml(lead.contact)}<span>${escapeHtml(lead.role)}</span></p>${labels ? `<div class="card-labels">${labels}</div>` : ""}${age ? `<p class="age-copy">${age.label}</p>` : ""}${lead.meeting ? `<p class="meeting">${lead.meeting}</p>` : ""}${due ? `<p class="followup-chip">Follow-up: ${humanDate(due.due_at)}</p>` : ""}${actions ? `<div class="card-actions">${actions}</div>` : ""}<footer><span class="card-stage">${stageNames[lead.stage]}</span>${lead.linkedinUrl ? `<button class="card-linkedin" data-action="open-linkedin" data-lead="${lead.id}">LinkedIn ↗</button>` : ""}</footer></article>`; }
 function emptyStage(column) { const messages = { base: "Leads cadastrados aguardam a proxima acao.", invite: "Abra o perfil, envie o convite e registre o envio.", pending: "Aguarde o aceite ou atualize manualmente.", accepted: "A mensagem longa esta pronta para copiar e editar.", message: "Registre quando houver resposta.", conversation: "Leads com conversa ativa.", scheduling: "Envie manualmente o link da agenda.", booked: "Reservas do Calendar aparecem aqui.", "create-project": "Arraste para ca uma call com interesse. O card vira um projeto em Pos-call.", discarded: "Leads descartados com motivo." }; return `<div class="empty-state">${messages[column] || "Sem cards nesta etapa."}</div>`; }
@@ -629,10 +665,10 @@ function scheduleRemoteRefresh() {
 }
 async function recordActivity(leadId, activityType, summary, metadata = {}) { await supabaseRequest("/rest/v1/lead_activities", { method: "POST", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ lead_id: leadId, activity_type: activityType, summary, metadata, created_by: state.remote.session.user.id }) }); }
 async function updateLeadStage(id, stage, extra = {}, message) { const lead = leadById(id); if (!lead || lead.stage === stage) return; if (!canMoveLead(lead.stage, stage)) { toast("Essa movimentacao precisa ser feita pela acao indicada no card."); return; } try { await supabaseRequest(`/rest/v1/leads?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", headers: { Prefer: "return=minimal" }, body: JSON.stringify({ current_stage: stage, ...extra }) }); await reloadAndRender(message || `Card movido para ${stageNames[stage]}.`); } catch (error) { toast(error.message || "A etapa nao foi atualizada."); } }
-async function completeLeadDrop(leadId, targetStage) {
-  const lead = leadById(leadId);
-  if (!lead || !canMoveLead(lead.stage, targetStage)) return;
-  const transitions = {
+// Um so lugar descreve o que cada avanco registra, para a acao em lote gravar
+// exatamente a mesma atividade que o botao individual do card.
+function leadTransitions() {
+  return {
     aprovado: { activity: "lead_approved", summary: "Lead aprovado para envio manual do convite.", message: "Lead pronto para o convite." },
     convite_enviado: { activity: "connection_invite_sent", summary: "Convite enviado manualmente no LinkedIn.", extra: { invited_at: new Date().toISOString() }, message: "Convite registrado como pendente." },
     conexao_aceita: { activity: "connection_accepted", summary: "Aceite de conexao confirmado manualmente.", extra: { accepted_at: new Date().toISOString() }, message: "Conexao aceita. A mensagem esta pronta." },
@@ -642,7 +678,11 @@ async function completeLeadDrop(leadId, targetStage) {
     call_marcada: { activity: "call_marked_manually", summary: "Call marcada manualmente no Kanban.", message: "Call marcada. O horario pode ser atualizado no card." },
     descartado: { activity: "lead_discarded", summary: "Lead descartado manualmente no Kanban.", extra: { discard_reason: "Descartado manualmente no Kanban." }, message: "Lead descartado." },
   };
-  const transition = transitions[targetStage];
+}
+async function completeLeadDrop(leadId, targetStage) {
+  const lead = leadById(leadId);
+  if (!lead || !canMoveLead(lead.stage, targetStage)) return;
+  const transition = leadTransitions()[targetStage];
   const isReturning = lead.stage === "descartado"
     || reversibleLeadStages.indexOf(targetStage) < reversibleLeadStages.indexOf(lead.stage);
   try {
@@ -1003,6 +1043,7 @@ function bindEvents() {
     if (button.dataset.lead) void promoteLeadToProject(button.dataset.lead);
   }));
   document.querySelectorAll("[data-action=open-selected-linkedin]").forEach((button) => button.addEventListener("click", () => openSelectedInviteProfiles()));
+  document.querySelectorAll("[data-action=mark-invites-sent]").forEach((button) => button.addEventListener("click", () => void markInviteSelectionAsSent(button)));
   document.querySelectorAll("[data-action=import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));
   document.querySelectorAll("[data-action=close-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = null; render(); }));
   document.querySelectorAll("[data-action=reset-import-csv]").forEach((button) => button.addEventListener("click", () => { state.importModal = {}; render(); }));
