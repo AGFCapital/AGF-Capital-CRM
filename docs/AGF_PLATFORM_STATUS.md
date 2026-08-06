@@ -1,6 +1,6 @@
 # Status da plataforma AGF
 
-Atualizado em 31 de julho de 2026.
+Atualizado em 6 de agosto de 2026.
 
 ## Resumo executivo
 
@@ -58,7 +58,10 @@ Kanban.
 
 ### Agenda
 
-- link público configurável;
+- link público individual e configurável no próprio perfil;
+- responsável e link congelados quando o lead entra em `agendamento`;
+- identificação da agenda de origem preparada no contrato do n8n;
+- validação transacional impede uma agenda de atualizar o card de outro sócio;
 - card mostra data e hora;
 - criação, remarcação e cancelamento tratados;
 - casamento por e-mail, empresa ou nome conservador;
@@ -72,7 +75,7 @@ Kanban.
 |---|---|
 | Supabase | conectado e fonte de verdade |
 | Google Calendar | conectado em conta de teste |
-| n8n Calendar | funcional no ambiente de teste |
+| n8n Calendar | fluxo legado testado; roteamento multiagenda pendente de teste |
 | n8n Follow-up/Gmail | conectado e ativo |
 | LinkedIn | manual |
 | Apollo | exportação CSV externa |
@@ -82,8 +85,18 @@ Kanban.
 
 ## Banco remoto
 
-As migrations até `20260802000100_shared_message_templates.sql` foram aplicadas
-no Supabase conectado.
+O repositório oficial passou a ser `AGFCapital/AGF-Capital-CRM`. O novo projeto
+Supabase de produção é o projeto AGF `icsilintddvfwhhxwqte`. Em 6 de agosto de
+2026 as 25 migrations e a importação transacional dos dados legados foram
+aplicadas pela CLI. Os quatro perfis antigos foram remapeados para os novos
+UUIDs do Auth por e-mail, sem perder ownership.
+
+A validação pós-importação confirmou 5 usuários e 5 perfis, 91 empresas, 92
+contatos, 628 registros no banco de leads, 89 leads, 3 projetos, 12 follow-ups,
+21 reservas de agenda e 381 atividades. Nenhuma referência de responsável,
+membro de projeto, destinatário de follow-up ou host de agenda ficou quebrada.
+Os cinco perfis ainda estavam sem `booking_url` e sem agenda habilitada no
+momento da auditoria.
 
 Principais extensões recentes:
 
@@ -104,6 +117,8 @@ Principais extensões recentes:
 - garantia de que o responsável principal sempre é membro do projeto.
 - quatro modelos de mensagem compartilhados em `app_settings`, editáveis na
   interface com validação das variáveis obrigatórias.
+- migration `20260805000100_profile_calendar_scheduling.sql` aplicada para
+  agenda individual, backfill de usuários Auth e validação multiagenda.
 
 ## Testes atuais
 
@@ -124,14 +139,13 @@ Os contratos locais cobrem:
 
 ## Pendências para produção
 
-1. trocar a agenda de teste pela conta definitiva do Giulio;
-2. executar teste ponta a ponta com o workflow definitivo;
+1. cadastrar `calendar_id` e link individual de cada sócio;
+2. adaptar o n8n para enviar a agenda de origem e executar teste ponta a ponta;
 3. validar destinatários reais dos e-mails de follow-up;
 4. revisar RLS e variáveis no ambiente de produção;
 5. publicar no domínio da AGF;
 6. definir rotina operacional de geração dos próximos CSVs;
-7. acompanhar uso do plano gratuito do Supabase e migrar apenas se métricas
-   reais exigirem.
+7. acompanhar consumo e capacidade do plano pago do Supabase da AGF.
 
 ## Decisões congeladas
 

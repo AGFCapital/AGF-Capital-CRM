@@ -47,7 +47,8 @@ etapa seguinte equivale a confirmar a ação correspondente.
   - liberação de 1 a 100 leads da base escolhida;
 - follow-ups individuais para leads e projetos, com sino, visão da equipe e e-mail via n8n;
 - alerta visual para cards parados;
-- Google Appointment Schedule com atualização automática da call;
+- Google Appointment Schedule individual por responsável, com atualização
+  automática da call;
 - tratamento de criação, remarcação e cancelamento;
 - pipeline comercial independente com criação manual;
 - valor dos projetos por etapa no dashboard;
@@ -67,7 +68,8 @@ CSV Apollo
 
 Google Calendar
   -> n8n
-  -> RPC de sincronização
+  -> identifica a agenda/perfil responsável
+  -> RPC de sincronização com validação de ownership
   -> calendar_bookings + atualização do lead
 
 Follow-up vencido
@@ -106,6 +108,12 @@ As migrations ficam em `supabase/migrations/` e são aplicadas por:
 ```powershell
 npx supabase db push
 ```
+
+O ambiente oficial usa o projeto Supabase AGF `icsilintddvfwhhxwqte`. As 25
+migrations e os dados legados foram migrados e validados em 6 de agosto de
+2026. Configurações individuais de agenda ficam em `profiles`; cada operador
+deve salvar seu link público na tela de Configurações antes de usar a etapa de
+agendamento.
 
 As migrations mais recentes adicionam:
 

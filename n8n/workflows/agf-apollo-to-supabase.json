@@ -34,7 +34,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://yyhstftoxecrtxqcydew.supabase.co/rest/v1/rpc/ingest_apollo_lead",
+        "url": "https://icsilintddvfwhhxwqte.supabase.co/rest/v1/rpc/ingest_apollo_lead",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,

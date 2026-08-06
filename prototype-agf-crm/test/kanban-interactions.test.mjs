@@ -13,6 +13,7 @@ const poolMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabas
 const bookingLifecycleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260728000300_calendar_booking_lifecycle.sql"), "utf8");
 const followUpOwnershipMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260729000400_follow_up_ownership_and_manual_operations.sql"), "utf8");
 const followUpCardResponsibleMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260731000100_follow_up_recipient_follows_card_responsible.sql"), "utf8");
+const profileCalendarMigrationSource = fs.readFileSync(path.join(here, "..", "..", "supabase", "migrations", "20260805000100_profile_calendar_scheduling.sql"), "utf8");
 
 assert.match(source, /const stageDropTargets = \{/,
   "Cada coluna operacional deve declarar a etapa que conclui ao receber um card.");
@@ -48,8 +49,8 @@ assert.match(source, /function bookingThanksMessage\(/,
   "Uma call marcada deve gerar uma mensagem curta de agradecimento.");
 assert.match(source, /data-action="copy-booking-thanks"/,
   "A mensagem de agradecimento deve estar disponível diretamente no card.");
-assert.match(source, /https:\/\/calendar\.app\.google\/AUvpXz41GDT5hwD36/,
-  "O link padrão deve apontar para o Appointment Schedule atual.");
+assert.match(source, /profile\.booking_url/,
+  "O link de agenda deve vir do perfil individual do responsável.");
 assert.match(templateSource, /Tenho conversado com empresas como a \{Empresa\}/,
   "O rascunho padrão deve usar o novo texto aprovado para a empresa.");
 assert.match(source, /renderMessageTemplate\(state\.settings\.messageTemplates\.linkedinMessage/,
@@ -70,7 +71,7 @@ assert.match(source, /window\.setInterval\(\(\) => void refreshRemoteData\(\), 1
   "A sincronizacao visual deve ocorrer em intervalo curto sem exigir reload manual.");
 assert.match(source, /scheduleRemoteRefresh\(\)/,
   "O ciclo de atualizacao remota deve iniciar para toda sessao autenticada.");
-assert.match(source, /calendar_bookings\(provider_event_id,provider_created_at,starts_at,status,meeting_url,match_status,created_at,updated_at\)/,
+assert.match(source, /calendar_bookings\(provider_event_id,provider_created_at,starts_at,status,meeting_url,match_status,host_profile_id,source_calendar_id,created_at,updated_at\)/,
   "O CRM deve carregar os campos necessarios para escolher a reserva ativa mais recente.");
 assert.match(source, /chooseLatestActiveBooking\(row\.calendar_bookings \|\| \[\]\)/,
   "O CRM deve escolher deterministicamente a ultima reserva ativa.");
@@ -154,6 +155,14 @@ assert.match(bookingLifecycleMigrationSource, /v_latest_active_booking_id/,
   "O cancelamento deve verificar se ainda existe outra reserva ativa para o lead.");
 assert.match(bookingLifecycleMigrationSource, /current_stage = 'agendamento'/,
   "Sem outra reserva ativa, uma call cancelada deve voltar de Call marcada para Agendamento.");
+assert.match(profileCalendarMigrationSource, /scheduling_profile_id uuid/,
+  "O lead deve congelar qual responsável forneceu a agenda.");
+assert.match(profileCalendarMigrationSource, /scheduling_booking_url text/,
+  "O link enviado ao lead deve permanecer preservado no card.");
+assert.match(profileCalendarMigrationSource, /sync_google_calendar_booking_core/,
+  "A validação multiagenda deve envolver o sincronizador existente sem perder seu ciclo de vida.");
+assert.match(profileCalendarMigrationSource, /v_expected_profile_id <> v_host_profile_id/,
+  "Uma reserva de outra agenda não pode atualizar o lead incorreto.");
 
 const latestBooking = chooseLatestActiveBooking([
   {

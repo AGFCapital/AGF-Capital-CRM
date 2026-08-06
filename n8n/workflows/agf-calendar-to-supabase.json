@@ -130,7 +130,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://yyhstftoxecrtxqcydew.supabase.co/rest/v1/rpc/sync_google_calendar_booking",
+        "url": "https://icsilintddvfwhhxwqte.supabase.co/rest/v1/rpc/sync_google_calendar_booking",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "supabaseApi",
         "sendHeaders": true,

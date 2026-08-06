@@ -4,3 +4,6 @@ prototype-agf-crm/.env.local
 # Generated scratch workspace used during lead extraction.
 .tmp_lead_pull/
 node_modules/
+
+# Arquivos privados e descartáveis da migração entre projetos Supabase.
+tmp/supabase-migration/

@@ -1,7 +1,7 @@
 # AGF CRM — contrato atual de integrações n8n
 
-**Versão:** 3.0
-**Atualizado em:** 31 de julho de 2026
+**Versão:** 3.1
+**Atualizado em:** 5 de agosto de 2026
 
 ## 1. Escopo ativo
 
@@ -34,13 +34,19 @@ Não participa do fluxo ativo:
 Objetivo: reconhecer reservas, remarcações e cancelamentos e refletir o estado
 no card.
 
-Entrada: Google Calendar Trigger da agenda conectada.
+Entrada: Google Calendar Trigger de cada agenda habilitada. Um único usuário
+técnico do Google pode monitorar agendas compartilhadas; sem compartilhamento,
+cada sócio precisa autorizar sua própria credencial OAuth no n8n.
 
 Saída: RPC de sincronização do Supabase.
 
 Regras:
 
 - `provider_event_id` é obrigatório e único;
+- enviar `host_profile_id` ou `source_calendar_id` em todo evento;
+- `source_calendar_id` precisa corresponder a `profiles.calendar_id`;
+- a agenda do evento precisa coincidir com `leads.scheduling_profile_id`;
+- divergência de agenda aborta a sincronização em vez de atualizar outro card;
 - preservar `raw_payload`;
 - converter a descrição HTML do Appointment Schedule em texto antes de ler
   respostas personalizadas;
@@ -102,7 +108,7 @@ O workflow lê `follow_up_email_deliveries` pendentes. A fila já contém:
 No n8n:
 
 - credencial de servidor do Supabase;
-- Google Calendar OAuth da agenda monitorada;
+- Google Calendar OAuth da conta técnica ou credenciais individuais;
 - Gmail OAuth da conta remetente.
 
 Na aplicação:
@@ -118,6 +124,8 @@ Nunca documentar valores reais de secrets.
 |---|---|
 | Calendar sem match | `unmatched`, sem mover lead |
 | Calendar ambíguo | `unmatched`, preservar payload |
+| Agenda sem perfil | falhar e registrar `source_calendar_id` no erro |
+| Agenda diferente da enviada ao lead | abortar toda a transação |
 | Evento repetido | atualizar a mesma reserva |
 | Gmail falha | marcar entrega `failed`; follow-up continua aberto |
 | Supabase indisponível | workflow falha com log; não inventar sucesso |
@@ -131,7 +139,9 @@ extração, Gemini ou LinkedIn estão obsoletos.
 
 ## 8. Checklist de produção
 
-- trocar Calendar de teste pela conta do Giulio;
+- cadastrar em cada perfil `booking_url` e `calendar_id`;
+- compartilhar cada agenda com a conta técnica ou conectar OAuth individual;
+- fazer cada trigger enviar `host_profile_id` ou `source_calendar_id`;
 - confirmar pergunta obrigatória `Empresa`;
 - validar timezone `America/Sao_Paulo`;
 - testar criar, remarcar e cancelar;
